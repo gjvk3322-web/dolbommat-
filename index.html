@@ -3,96 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT - 기업 도약 프로세스 매니저</title>
+    <title>RE:BOOT | AI 기업 회생 솔루션</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .step-card { transition: all 0.3s ease; border-left: 5px solid #e5e7eb; }
-        .step-card:hover { transform: translateY(-5px); shadow: lg; }
-        .active-step { border-left-color: #2563eb; background-color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+        .loader { border-top-color: #3498db; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased">
+<body class="bg-slate-50 min-h-screen">
 
-    <header class="bg-blue-900 text-white py-8 px-6 shadow-md text-center">
-        <h1 class="text-3xl font-bold tracking-tight">🚀 Project: RE-BOOT</h1>
-        <p class="mt-2 text-blue-200">회사의 체질 개선을 위한 3단계 문제 해결 프로세스</p>
+    <header class="bg-slate-900 text-white py-10 px-6 shadow-xl relative overflow-hidden">
+        <div class="max-w-5xl mx-auto relative z-10 text-center">
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2">🚀 Project RE:BOOT</h1>
+            <p class="text-slate-400 text-lg">회사의 위기를 기회로 바꾸는 AI 전략 보고서 생성기</p>
+        </div>
+        <div class="absolute top-0 right-0 p-4 opacity-10 text-9xl"><i class="fas fa-chart-line"></i></div>
     </header>
 
-    <main class="max-w-5xl mx-auto py-10 px-4">
+    <main class="max-w-5xl mx-auto py-12 px-4 space-y-12">
         
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center text-blue-700">
-                <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2 text-sm">1</span>
-                문제 인식 (현상 파악 & 원인 규명)
+        <section class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100">
+            <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center">
+                <i class="fas fa-edit mr-3 text-blue-600"></i> 현재 회사의 상황을 말씀해 주세요
             </h2>
-            <div class="grid md:grid-cols-3 gap-4">
-                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
-                    <label class="block font-semibold mb-2 text-sm text-gray-600">현재 상황 (As-Is)</label>
-                    <textarea id="issue_desc" class="w-full h-32 p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="거시적 관점에서 현재의 위기 상황을 적어주세요."></textarea>
-                </div>
-                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
-                    <label class="block font-semibold mb-2 text-sm text-gray-600">원인 분석 (Gap 분석)</label>
-                    <textarea id="cause_analysis" class="w-full h-32 p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="목표와 현실의 차이가 발생하는 진짜 원인은 무엇인가요?"></textarea>
-                </div>
-                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
-                    <label class="block font-semibold mb-2 text-sm text-gray-600">핵심 과제 (Must-Do)</label>
-                    <textarea id="core_task" class="w-full h-32 p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="가장 먼저 해결해야 할 우선순위 과제는?"></textarea>
-                </div>
-            </div>
+            <textarea id="userInput" class="w-full h-40 p-5 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all outline-none text-lg" 
+                placeholder="예시: 매출이 작년 대비 30% 감소했고 직원들 사기가 떨어졌습니다. 새로운 온라인 판로를 개척하고 싶은데 어디서부터 시작해야 할지 모르겠습니다."></textarea>
+            
+            <button onclick="generateStrategy()" id="btnAction" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-xl shadow-lg transform hover:-translate-y-1 transition-all flex items-center justify-center text-xl">
+                <i class="fas fa-robot mr-3"></i> AI 전략 분석 시작하기
+            </button>
         </section>
 
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center text-green-700">
-                <span class="bg-green-700 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2 text-sm">2</span>
-                해결 방안 탐색 (전략 수립)
-            </h2>
-            <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
-                    <label class="block font-semibold mb-2 text-sm text-gray-600">SMART 목표 수립</label>
-                    <input type="text" id="smart_goal" class="w-full p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-green-500" placeholder="구체적이고 측정 가능한 목표를 입력하세요.">
-                </div>
-                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
-                    <label class="block font-semibold mb-2 text-sm text-gray-600">해결 대안 브레인스토밍</label>
-                    <textarea id="solutions" class="w-full h-24 p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-green-500" placeholder="전문성/창의성을 발휘한 다양한 방안들..."></textarea>
-                </div>
-            </div>
-        </section>
+        <div id="loading" class="hidden flex flex-col items-center justify-center space-y-4">
+            <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
+            <p class="text-blue-600 font-bold animate-pulse">돌봄매트 AI가 전략을 수립 중입니다...</p>
+        </div>
 
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center text-orange-700">
-                <span class="bg-orange-700 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2 text-sm">3</span>
-                실행 계획 (Action Plan)
-            </h2>
-            <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500">
-                <div class="mb-4">
-                    <label class="block font-bold text-gray-700 mb-2">최종 선정 방안 & 시나리오</label>
-                    <textarea id="final_plan" class="w-full h-32 p-3 border rounded outline-none focus:ring-2 focus:ring-orange-500" placeholder="위험 요소(비상 계획)를 포함한 세부 실행 계획을 수립하세요."></textarea>
-                </div>
-                <button onclick="savePlan()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-lg shadow-lg transition duration-300">
-                    도약 계획서(RE-BOOT REPORT) 확정하기
-                </button>
+        <div id="resultArea" class="hidden space-y-8">
+            
+            <div class="bg-white p-8 rounded-2xl shadow-md border-l-8 border-blue-500">
+                <h3 class="text-xl font-bold text-blue-800 mb-4 flex items-center">
+                    <span class="bg-blue-100 text-blue-800 rounded-lg px-3 py-1 mr-3 text-sm italic">Step 01</span> 문제 인식
+                </h3>
+                <div id="step1_content" class="prose max-w-none text-slate-700 leading-relaxed whitespace-pre-wrap"></div>
             </div>
-        </section>
 
+            <div class="bg-white p-8 rounded-2xl shadow-md border-l-8 border-emerald-500">
+                <h3 class="text-xl font-bold text-emerald-800 mb-4 flex items-center">
+                    <span class="bg-emerald-100 text-emerald-800 rounded-lg px-3 py-1 mr-3 text-sm italic">Step 02</span> 해결 방안 탐색
+                </h3>
+                <div id="step2_content" class="prose max-w-none text-slate-700 leading-relaxed whitespace-pre-wrap"></div>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow-md border-l-8 border-orange-500">
+                <h3 class="text-xl font-bold text-orange-800 mb-4 flex items-center">
+                    <span class="bg-orange-100 text-orange-800 rounded-lg px-3 py-1 mr-3 text-sm italic">Step 03</span> 실행 계획 (Action Plan)
+                </h3>
+                <div id="step3_content" class="prose max-w-none text-slate-700 leading-relaxed whitespace-pre-wrap"></div>
+            </div>
+
+            <button onclick="window.print()" class="w-full bg-slate-800 text-white py-4 rounded-xl font-bold hover:bg-black transition-colors">
+                <i class="fas fa-file-pdf mr-2"></i> 보고서로 출력하기 (PDF)
+            </button>
+        </div>
     </main>
 
     <script>
-        function savePlan() {
-            const plan = {
-                issue: document.getElementById('issue_desc').value,
-                cause: document.getElementById('cause_analysis').value,
-                core: document.getElementById('core_task').value,
-                goal: document.getElementById('smart_goal').value,
-                final: document.getElementById('final_plan').value
-            };
-            
-            if(!plan.issue || !plan.final) {
-                alert("아직 작성 중인 항목이 있습니다. 모든 단계를 신중히 검토해 주세요.");
-                return;
-            }
+        // 여기에 API 키를 넣으세요
+        const API_KEY = AIzaSyCMypsSk9OnkjvF3RxWW6sFa-9nyMMWV8c; 
 
-            console.log("Saving Plan:", plan);
-            alert("전략이 확정되었습니다! 이 데이터를 바탕으로 새롭게 도약할 준비가 되었습니다.");
+        async function generateStrategy() {
+            const userInput = document.getElementById('userInput').value;
+            if(!userInput) return alert("내용을 입력해주세요!");
+
+            const btn = document.getElementById('btnAction');
+            const loading = document.getElementById('loading');
+            const resultArea = document.getElementById('resultArea');
+
+            // UI 초기화
+            btn.disabled = true;
+            loading.classList.remove('hidden');
+            resultArea.classList.add('hidden');
+
+            const prompt = `
+            너는 기업 회생 및 전략 컨설팅 전문가 '돌봄매트'야.
+            사용자가 제공한 현재 기업 상황: "${userInput}"
+
+            제시된 이미지의 [일반적인 문제 해결 프로세스] 3단계에 맞춰서 분석 보고서를 작성해줘.
+            
+            1단계: [문제 인식] - 현재 상황 파악, 차이 분석을 통한 핵심 원인 규명, 가장 시급한 핵심 과제 도출.
+            2단계: [해결 방안 탐색] - SMART 기준에 따른 목표 수립, 전문성과 창의성을 발휘한 3가지 구체적 해결 방안.
+            3단계: [선정 및 실행] - 최적안 선정 이유, 세부 실행 계획, 그리고 발생 가능한 리스크에 대한 비상 계획(Contingency Plan).
+
+            각 단계별로 내용을 구분해서 한국어로 친절하고 논리적으로 작성해줘.
+            `;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+
+                const data = await response.json();
+                const fullText = data.candidates[0].content.parts[0].text;
+
+                // 텍스트 분리 로직 (간단하게 구현)
+                const sections = fullText.split(/1단계|2단계|3단계/);
+                
+                document.getElementById('step1_content').innerText = sections[1] || "분석 실패";
+                document.getElementById('step2_content').innerText = sections[2] || "분석 실패";
+                document.getElementById('step3_content').innerText = sections[3] || "분석 실패";
+
+                resultArea.classList.remove('hidden');
+                resultArea.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                alert("분석 중 오류가 발생했습니다. API 키를 확인해주세요.");
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                loading.classList.add('hidden');
+            }
         }
     </script>
 </body>
