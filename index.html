@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT PRO v5.0 | 동기화 완벽 마스터플랜</title>
+    <title>RE:BOOT PRO v5.2 | 새로고침 방어 및 자동 저장</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -29,7 +29,9 @@
         .memo-pad textarea { height: calc(100% - 40px); background: repeating-linear-gradient(transparent, transparent 27px, #fef08a 28px); line-height: 28px; padding-top: 4px; color: #854d0e; font-weight: 600; }
         
         .history-card { border-left: 5px solid #3b82f6; page-break-inside: avoid; }
-        .auto-summary-list { height: 160px; overflow-y: auto; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        
+        /* 요약판 3칸 확장 유지 */
+        .auto-summary-list { height: 230px; overflow-y: auto; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
         .auto-summary-item { font-size: 0.85rem; padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         
         .gantt-grid { display: grid; grid-template-columns: 200px 1fr; gap: 10px; align-items: center; margin-bottom: 6px; }
@@ -42,8 +44,8 @@
 
     <div class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end no-print">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v5.0</span></h1>
-            <p class="text-sm text-gray-500 mt-1 font-bold">요약판 동기화 버그 100% 해결된 마스터 버전</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v5.2</span></h1>
+            <p class="text-sm text-gray-500 mt-1 font-bold">새로고침 방어(자동 저장) 기능 및 UI 최적화 완료</p>
         </div>
         <div class="flex gap-3 items-center">
             <button onclick="startNewStrategy()" class="bg-white border border-gray-300 hover:bg-gray-50 text-slate-700 px-5 py-2.5 rounded-lg font-bold shadow-sm transition-all">
@@ -129,12 +131,12 @@
                 <div class="box-wrapper mb-4"><div class="box-title">세부 실행 계획 (Enter로 줄바꿈)</div><textarea id="p3_2" class="h-[80px]" placeholder="1. 상세페이지 제작&#10;2. 맘카페 체험단 모집&#10;3. SNS 타겟광고 세팅"></textarea></div>
                 
                 <div class="flex gap-2 mt-auto print:hidden">
-                    <button id="main-save-btn" onclick="saveToHistory()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all duration-300">
-                        <i id="save-btn-icon" class="fas fa-save mr-3 text-2xl text-blue-400"></i> 
+                    <button id="main-save-btn" onclick="saveToHistory()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-extrabold text-[1rem] shadow-xl border border-slate-900 transition-all duration-300 leading-snug px-2 text-center">
+                        <i id="save-btn-icon" class="fas fa-save mr-2 text-xl text-blue-400"></i> 
                         <span id="save-btn-text">전략 전체 저장 (새로 추가)</span>
                     </button>
-                    <button id="save-as-new-btn" onclick="saveAsNew()" class="hidden w-[90px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg h-[92px] flex-col items-center justify-center font-bold text-[0.8rem] shadow-xl border border-blue-700 transition-all duration-300">
-                        <i class="fas fa-copy text-xl mb-1"></i>새로 추가
+                    <button id="save-as-new-btn" onclick="saveAsNew()" class="hidden w-[85px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg h-[92px] flex-col items-center justify-center font-bold text-[0.8rem] shadow-xl border border-blue-700 transition-all duration-300 flex-shrink-0">
+                        <i class="fas fa-copy text-lg mb-1"></i>새로 추가
                     </button>
                 </div>
                 <div class="hidden print:flex bg-slate-100 text-slate-800 rounded-lg h-[92px] items-center justify-center font-black text-lg tracking-widest shadow-inner border border-slate-300 w-full mt-auto">
@@ -171,6 +173,20 @@
 
         const chartColors = ['bg-blue-500', 'bg-indigo-500', 'bg-emerald-500', 'bg-purple-500', 'bg-cyan-600'];
 
+        // 🌟 실시간 캔버스 자동 저장 함수 (새로고침 대비)
+        function saveDraft() {
+            const draft = {
+                editingId: currentEditingId,
+                gantt: currentGanttTasks,
+                status: document.getElementById('strategy-status').value,
+                fields: {}
+            };
+            fields.forEach(id => {
+                draft.fields[id] = document.getElementById(id).value;
+            });
+            localStorage.setItem('pro_v5_2_draft', JSON.stringify(draft));
+        }
+
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
@@ -182,7 +198,6 @@
             }, 3000);
         }
 
-        // 버튼 상태 변경
         function updateSaveButtonUI() {
             const btn = document.getElementById('main-save-btn');
             const text = document.getElementById('save-btn-text');
@@ -190,13 +205,15 @@
             const newBtn = document.getElementById('save-as-new-btn');
             
             if(currentEditingId) {
-                btn.className = "flex-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-emerald-800 transition-all duration-300 print:hidden";
-                icon.className = "fas fa-save mr-3 text-2xl text-emerald-300";
-                text.innerText = "현재 화면 덮어쓰기 (업데이트)";
+                // 수정 모드: 글씨 깔끔하게 '현재 전략 덮어쓰기'
+                btn.className = "flex-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg h-[92px] flex items-center justify-center font-extrabold text-[1rem] shadow-xl border border-emerald-800 transition-all duration-300 print:hidden px-2 text-center leading-snug";
+                icon.className = "fas fa-save mr-2 text-xl text-emerald-300";
+                text.innerText = "현재 전략 덮어쓰기";
                 newBtn.classList.remove('hidden'); newBtn.classList.add('flex');
             } else {
-                btn.className = "flex-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all duration-300 print:hidden";
-                icon.className = "fas fa-save mr-3 text-2xl text-blue-400";
+                // 신규 누적 모드
+                btn.className = "flex-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-extrabold text-[1rem] shadow-xl border border-slate-900 transition-all duration-300 print:hidden px-2 text-center leading-snug";
+                icon.className = "fas fa-save mr-2 text-xl text-blue-400";
                 text.innerText = "전략 전체 저장 (새로 추가)";
                 newBtn.classList.add('hidden'); newBtn.classList.remove('flex');
             }
@@ -211,8 +228,7 @@
                 opt.value = `[현재 작성중] ${currentTitle}`;
                 datalist.appendChild(opt);
             }
-            // v5.0 데이터베이스 사용
-            const history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v5_2_history') || "[]");
             history.forEach(item => {
                 const title = item.details["현황"] || "무제 전략";
                 const task = item.details["과제"] || "";
@@ -222,9 +238,31 @@
             });
         }
 
-        document.getElementById('p1_1').addEventListener('input', updateGanttSuggestions);
-
+        // 초기 로딩 시 임시 저장본(Draft) 복구 로직
         window.onload = () => {
+            const draftStr = localStorage.getItem('pro_v5_2_draft');
+            if(draftStr) {
+                const draft = JSON.parse(draftStr);
+                currentEditingId = draft.editingId || null;
+                currentGanttTasks = draft.gantt || [];
+                if(draft.status) document.getElementById('strategy-status').value = draft.status;
+                if(draft.fields) {
+                    fields.forEach(id => {
+                        document.getElementById(id).value = draft.fields[id] || "";
+                    });
+                }
+            }
+
+            // 실시간 저장을 위한 이벤트 등록
+            fields.forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    saveDraft();
+                    if(id === 'p1_1') updateGanttSuggestions();
+                });
+            });
+            document.getElementById('strategy-status').addEventListener('change', saveDraft);
+
+            drawGantt();
             renderHistory();
             updateGanttSuggestions(); 
             updateSaveButtonUI();
@@ -236,9 +274,11 @@
                 fields.forEach(id => document.getElementById(id).value = "");
                 currentGanttTasks = [];
                 document.getElementById('strategy-status').value = "초안 작성중";
+                
                 drawGantt();
                 updateGanttSuggestions();
                 updateSaveButtonUI(); 
+                saveDraft(); // 초기화 상태도 임시 저장
                 showToast("새 캔버스가 준비되었습니다.");
             }
         }
@@ -254,12 +294,15 @@
             currentGanttTasks.push({ id: Date.now(), name, start, end });
             document.getElementById('g-name').value = '';
             document.getElementById('g-start').value = end; 
+            
             drawGantt();
+            saveDraft(); // 추가될 때마다 임시 저장
         }
 
         function removeGanttTask(id) {
             currentGanttTasks = currentGanttTasks.filter(t => t.id !== id);
             drawGantt();
+            saveDraft(); // 삭제될 때마다 임시 저장
         }
 
         function drawGantt() {
@@ -289,7 +332,6 @@
             });
         }
 
-        // 🌟 저장 로직 완전 무결성 확보
         function saveToHistory() {
             let hasContent = false;
             let newDetails = {};
@@ -301,10 +343,9 @@
 
             if(!hasContent && currentGanttTasks.length === 0) return alert("저장할 내용을 하나라도 입력해주세요.");
 
-            let history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
+            let history = JSON.parse(localStorage.getItem('pro_v5_2_history') || "[]");
 
             if(currentEditingId) {
-                // 기존 데이터 덮어쓰기
                 const itemIndex = history.findIndex(h => h.id === currentEditingId);
                 if(itemIndex > -1) {
                     history[itemIndex].details = newDetails;
@@ -314,7 +355,6 @@
                     showToast("기존 전략에 안전하게 덮어쓰기 되었습니다!");
                 }
             } else {
-                // 신규 데이터 추가! 추가하자마자 바로 수정 모드로 진입시켜 중복 생성 방지
                 currentEditingId = Date.now();
                 history.unshift({ 
                     id: currentEditingId, 
@@ -323,32 +363,29 @@
                     details: newDetails, 
                     gantt: [...currentGanttTasks] 
                 });
-                showToast("새로운 전략이 저장되었습니다! (이후 저장 시 덮어쓰기 됩니다)");
+                showToast("새로운 전략이 저장되었습니다!");
             }
 
-            localStorage.setItem('pro_v5_0_history', JSON.stringify(history));
+            localStorage.setItem('pro_v5_2_history', JSON.stringify(history));
 
-            // 데이터 즉시 동기화
             renderHistory();
             updateGanttSuggestions(); 
             updateSaveButtonUI();
+            saveDraft(); // 저장 후 상태도 임시 저장
             
-            // 시각적 액션
             document.getElementById('main-save-btn').classList.add('scale-95');
             setTimeout(() => document.getElementById('main-save-btn').classList.remove('scale-95'), 150);
         }
 
-        // 가지치기 (기존 내용 놔두고 새로운 카드로 분리 저장)
         function saveAsNew() {
             currentEditingId = null; 
             saveToHistory();         
         }
 
-        // 🌟 렌더링 로직 (innerHTML 1회 업데이트로 버그 원천 차단)
         function renderHistory() {
             const container = document.getElementById('history-container');
             const summaryBoard = document.getElementById('auto-summary-board');
-            const history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v5_2_history') || "[]");
             
             document.getElementById('history-count').innerText = `${history.length}건`;
 
@@ -371,7 +408,6 @@
                 if(item.status.includes("검토")) statusColor = "bg-orange-100 text-orange-700";
                 if(item.status.includes("확정")) statusColor = "bg-green-100 text-green-700";
 
-                // 상단 요약판 HTML 생성
                 summaryHtml += `
                     <div class="auto-summary-item flex flex-col justify-center">
                         <div class="flex items-center mb-1">
@@ -391,7 +427,6 @@
                     } return '';
                 }).join('');
 
-                // 하단 아카이브 HTML 생성
                 containerHtml += `
                     <div id="card-${item.id}" class="history-card bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                         <div class="flex justify-between items-center mb-3">
@@ -410,22 +445,24 @@
                 `;
             });
 
-            // 화면에 한 번만 주입 (에러 방지)
             summaryBoard.innerHTML = summaryHtml;
             container.innerHTML = containerHtml;
         }
 
         function loadStrategy(id) {
-            const history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v5_2_history') || "[]");
             const item = history.find(h => h.id === id);
             if(item) {
                 currentEditingId = id; 
                 fields.forEach((fieldId, idx) => { document.getElementById(fieldId).value = item.details[labels[idx]] || ""; });
                 document.getElementById('strategy-status').value = item.status || "초안 작성중";
                 currentGanttTasks = item.gantt ? [...item.gantt] : [];
+                
                 drawGantt();
                 updateGanttSuggestions();
                 updateSaveButtonUI(); 
+                saveDraft(); // 불러온 상태를 임시 저장
+                
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 showToast("불러오기 완료! 하단의 초록색 버튼을 누르면 덮어쓰기 됩니다.");
             }
@@ -433,10 +470,14 @@
 
         function deleteStrategy(id) {
             if(confirm("이 전략을 영구 삭제하시겠습니까?")) {
-                let history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
+                let history = JSON.parse(localStorage.getItem('pro_v5_2_history') || "[]");
                 history = history.filter(h => h.id !== id);
-                localStorage.setItem('pro_v5_0_history', JSON.stringify(history));
-                if(currentEditingId === id) { currentEditingId = null; updateSaveButtonUI(); }
+                localStorage.setItem('pro_v5_2_history', JSON.stringify(history));
+                if(currentEditingId === id) { 
+                    currentEditingId = null; 
+                    updateSaveButtonUI(); 
+                    saveDraft(); 
+                }
                 renderHistory();
                 updateGanttSuggestions();
             }
