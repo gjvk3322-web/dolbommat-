@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT PRO v4.5 | 데이터 누적 및 덮어쓰기 완벽 지원</title>
+    <title>RE:BOOT PRO v4.5 | 저장 오류 해결 및 스마트 UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -43,11 +43,11 @@
     <div class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end no-print">
         <div>
             <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v4.5</span></h1>
-            <p class="text-sm text-gray-500 mt-1 font-bold">전략 누적 저장 오류 완벽 수정 및 스마트 버튼 탑재</p>
+            <p class="text-sm text-gray-500 mt-1 font-bold">저장 누락 오류 100% 해결 및 스마트 버튼 UI 적용</p>
         </div>
         <div class="flex gap-3 items-center">
             <button onclick="startNewStrategy()" class="bg-white border border-gray-300 hover:bg-gray-50 text-slate-700 px-5 py-2.5 rounded-lg font-bold shadow-sm transition-all">
-                <i class="fas fa-sync-alt mr-2"></i> 새 캔버스 열기
+                <i class="fas fa-sync-alt mr-2"></i> 새 캔버스 열기 (초기화)
             </button>
             <select id="strategy-status" class="bg-white border border-gray-300 text-slate-700 h-[45px] px-4 rounded-lg font-bold outline-none cursor-pointer shadow-sm">
                 <option value="초안 작성중">📝 초안 작성중</option>
@@ -128,11 +128,17 @@
                 <div class="box-wrapper"><div class="box-title">최적안 선정</div><textarea id="p3_1" class="h-[80px]" placeholder="예: 인터넷 판매 메인, SNS 협찬 병행"></textarea></div>
                 <div class="box-wrapper mb-4"><div class="box-title">세부 실행 계획 (Enter로 줄바꿈)</div><textarea id="p3_2" class="h-[80px]" placeholder="1. 상세페이지 제작&#10;2. 맘카페 체험단 모집&#10;3. SNS 타겟광고 세팅"></textarea></div>
                 
-                <button id="main-save-btn" onclick="saveToHistory()" class="mt-auto w-full bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all duration-300 print:hidden">
-                    <i id="save-btn-icon" class="fas fa-save mr-3 text-2xl text-blue-400"></i> 
-                    <span id="save-btn-text">새로운 전략 추가 저장</span>
-                </button>
-                <div class="hidden print:flex bg-slate-100 text-slate-800 rounded-lg h-[92px] items-center justify-center font-black text-lg tracking-widest shadow-inner border border-slate-300">
+                <div class="flex gap-2 mt-auto print:hidden">
+                    <button id="main-save-btn" onclick="saveToHistory()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all duration-300">
+                        <i id="save-btn-icon" class="fas fa-save mr-3 text-2xl text-blue-400"></i> 
+                        <span id="save-btn-text">전략 전체 저장 (새로 추가)</span>
+                    </button>
+                    <button id="save-as-new-btn" onclick="saveAsNew()" class="hidden w-[90px] bg-blue-600 hover:bg-blue-700 text-white rounded-lg h-[92px] flex-col items-center justify-center font-bold text-[0.8rem] shadow-xl border border-blue-700 transition-all duration-300">
+                        <i class="fas fa-copy text-xl mb-1"></i>새로 추가
+                    </button>
+                </div>
+
+                <div class="hidden print:flex bg-slate-100 text-slate-800 rounded-lg h-[92px] items-center justify-center font-black text-lg tracking-widest shadow-inner border border-slate-300 w-full mt-auto">
                     RE:BOOT SPRINT PLAN
                 </div>
             </div>
@@ -162,7 +168,7 @@
         const labels = ['현황', '원인', '과제', '목표', '대안', '평가', '결정', '계획', '메모'];
 
         let currentGanttTasks = [];
-        let currentEditingId = null; // 수정 모드 추적용 변수
+        let currentEditingId = null; 
 
         const chartColors = ['bg-blue-500', 'bg-indigo-500', 'bg-emerald-500', 'bg-purple-500', 'bg-cyan-600'];
 
@@ -177,26 +183,27 @@
             }, 3000);
         }
 
-        // 🌟 스마트 버튼 UI 업데이트 함수
+        // 🌟 버튼 UI 업데이트 함수
         function updateSaveButtonUI() {
             const btn = document.getElementById('main-save-btn');
             const text = document.getElementById('save-btn-text');
             const icon = document.getElementById('save-btn-icon');
+            const newBtn = document.getElementById('save-as-new-btn');
             
             if(currentEditingId) {
-                // 수정(덮어쓰기) 모드일 때는 초록색으로 변신
-                btn.classList.replace('bg-slate-800', 'bg-emerald-700');
-                btn.classList.replace('hover:bg-slate-900', 'hover:bg-emerald-800');
-                btn.classList.replace('border-slate-900', 'border-emerald-800');
-                icon.classList.replace('text-blue-400', 'text-emerald-300');
-                text.innerText = "현재 전략 덮어쓰기 (수정)";
+                // 수정 모드일 때
+                btn.className = "flex-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-emerald-800 transition-all duration-300 print:hidden";
+                icon.className = "fas fa-save mr-3 text-2xl text-emerald-300";
+                text.innerText = "불러온 전략 덮어쓰기";
+                newBtn.classList.remove('hidden');
+                newBtn.classList.add('flex');
             } else {
-                // 신규 추가 모드일 때는 딥 슬레이트(남색)
-                btn.classList.replace('bg-emerald-700', 'bg-slate-800');
-                btn.classList.replace('hover:bg-emerald-800', 'hover:bg-slate-900');
-                btn.classList.replace('border-emerald-800', 'border-slate-900');
-                icon.classList.replace('text-emerald-300', 'text-blue-400');
-                text.innerText = "새로운 전략 추가 저장";
+                // 신규 누적 모드일 때
+                btn.className = "flex-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all duration-300 print:hidden";
+                icon.className = "fas fa-save mr-3 text-2xl text-blue-400";
+                text.innerText = "전략 전체 저장 (새로 추가)";
+                newBtn.classList.add('hidden');
+                newBtn.classList.remove('flex');
             }
         }
 
@@ -229,16 +236,16 @@
             updateSaveButtonUI();
         };
 
-        // 새 캔버스 열기
+        // 완전 초기화
         function startNewStrategy() {
-            if(confirm("화면을 비우고 새 전략을 작성하시겠습니까? (저장하지 않은 내용은 사라집니다)")) {
-                currentEditingId = null; // 🌟 신규 모드로 확실히 전환
+            if(confirm("화면을 비우고 새 전략을 작성하시겠습니까?")) {
+                currentEditingId = null; 
                 fields.forEach(id => document.getElementById(id).value = "");
                 currentGanttTasks = [];
                 document.getElementById('strategy-status').value = "초안 작성중";
                 drawGantt();
                 updateGanttSuggestions();
-                updateSaveButtonUI(); // 버튼 원래대로
+                updateSaveButtonUI(); 
                 showToast("새 캔버스가 준비되었습니다.");
             }
         }
@@ -290,7 +297,7 @@
             });
         }
 
-        // 🌟 수정된 핵심 로직: 새 저장은 누적, 수정 모드일 때만 덮어쓰기!
+        // 🌟 수정된 저장 로직 (누락 없이 안전하게)
         function saveToHistory() {
             let hasContent = false;
             let newDetails = {};
@@ -305,17 +312,17 @@
             let history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
 
             if(currentEditingId) {
-                // [기존 전략 덮어쓰기]
+                // 기존 데이터 업데이트
                 const itemIndex = history.findIndex(h => h.id === currentEditingId);
                 if(itemIndex > -1) {
                     history[itemIndex].details = newDetails;
                     history[itemIndex].gantt = [...currentGanttTasks];
                     history[itemIndex].status = document.getElementById('strategy-status').value;
                     history[itemIndex].date = new Date().toLocaleString('ko-KR') + " (수정됨)";
-                    showToast("기존 전략이 성공적으로 업데이트(덮어쓰기) 되었습니다!");
+                    showToast("기존 전략이 성공적으로 덮어쓰기 되었습니다!");
                 }
             } else {
-                // [새로운 전략 누적 저장] - 여기서 currentEditingId를 세팅하지 않으므로 계속 추가됨!
+                // 🌟 신규 데이터는 무조건 추가! (여기서 currentEditingId를 세팅하지 않습니다)
                 history.unshift({ 
                     id: Date.now(), 
                     date: new Date().toLocaleString('ko-KR'), 
@@ -323,13 +330,23 @@
                     details: newDetails, 
                     gantt: [...currentGanttTasks] 
                 });
-                showToast("새로운 전략이 리스트에 추가되었습니다!");
+                showToast("새로운 전략이 리스트에 추가(누적)되었습니다!");
             }
 
             localStorage.setItem('pro_v4_5_history', JSON.stringify(history));
 
             renderHistory();
             updateGanttSuggestions(); 
+            // 시각적 피드백
+            document.getElementById('main-save-btn').classList.add('scale-95');
+            setTimeout(() => document.getElementById('main-save-btn').classList.remove('scale-95'), 150);
+        }
+
+        // 기존 폼 내용을 유지한 채 새로운 카드로 뻗어나가고 싶을 때
+        function saveAsNew() {
+            currentEditingId = null; // 수정 모드 해제
+            saveToHistory();         // 신규 저장 로직 태우기
+            updateSaveButtonUI();    // 버튼 UI 원래대로
         }
 
         function renderHistory() {
@@ -383,7 +400,7 @@
                                 <h3 class="text-md font-extrabold text-gray-900">${title}</h3>
                             </div>
                             <div class="flex gap-2 no-print">
-                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded font-bold transition">불러오기(수정)</button>
+                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded font-bold transition"><i class="fas fa-edit mr-1"></i>불러오기(수정)</button>
                                 <button onclick="exportSingleCard(${item.id})" class="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1.5 rounded font-bold transition">PDF 다운</button>
                                 <button onclick="deleteStrategy(${item.id})" class="text-xs text-red-400 hover:text-red-600 p-1.5"><i class="fas fa-trash"></i></button>
                             </div>
@@ -394,20 +411,20 @@
             });
         }
 
-        // 불러오기 시 덮어쓰기 모드로 전환
+        // 전략 불러올 때 수정 모드(EditingId) 활성화
         function loadStrategy(id) {
             const history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
             const item = history.find(h => h.id === id);
             if(item) {
-                currentEditingId = id; // 🌟 덮어쓰기할 ID 기억!
+                currentEditingId = id; 
                 fields.forEach((fieldId, idx) => { document.getElementById(fieldId).value = item.details[labels[idx]] || ""; });
                 document.getElementById('strategy-status').value = item.status || "초안 작성중";
                 currentGanttTasks = item.gantt ? [...item.gantt] : [];
                 drawGantt();
                 updateGanttSuggestions();
-                updateSaveButtonUI(); // 버튼 초록색으로 변경!
+                updateSaveButtonUI(); 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                showToast("불러오기 완료! 내용을 수정하고 버튼을 누르면 기존 내용이 덮어쓰기 됩니다.");
+                showToast("불러오기 완료! 내용을 고치고 하단의 초록색 버튼을 누르면 덮어쓰기 됩니다.");
             }
         }
 
@@ -417,6 +434,7 @@
                 history = history.filter(h => h.id !== id);
                 localStorage.setItem('pro_v4_5_history', JSON.stringify(history));
                 
+                // 만약 삭제한 걸 현재 수정 중이었다면 모드 해제
                 if(currentEditingId === id) {
                     currentEditingId = null;
                     updateSaveButtonUI();
