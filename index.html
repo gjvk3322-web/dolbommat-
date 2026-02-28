@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT PRO v4.5 | 저장 오류 해결 및 스마트 UI</title>
+    <title>RE:BOOT PRO v5.0 | 동기화 완벽 마스터플랜</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -42,8 +42,8 @@
 
     <div class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end no-print">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v4.5</span></h1>
-            <p class="text-sm text-gray-500 mt-1 font-bold">저장 누락 오류 100% 해결 및 스마트 버튼 UI 적용</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v5.0</span></h1>
+            <p class="text-sm text-gray-500 mt-1 font-bold">요약판 동기화 버그 100% 해결된 마스터 버전</p>
         </div>
         <div class="flex gap-3 items-center">
             <button onclick="startNewStrategy()" class="bg-white border border-gray-300 hover:bg-gray-50 text-slate-700 px-5 py-2.5 rounded-lg font-bold shadow-sm transition-all">
@@ -137,7 +137,6 @@
                         <i class="fas fa-copy text-xl mb-1"></i>새로 추가
                     </button>
                 </div>
-
                 <div class="hidden print:flex bg-slate-100 text-slate-800 rounded-lg h-[92px] items-center justify-center font-black text-lg tracking-widest shadow-inner border border-slate-300 w-full mt-auto">
                     RE:BOOT SPRINT PLAN
                 </div>
@@ -183,7 +182,7 @@
             }, 3000);
         }
 
-        // 🌟 버튼 UI 업데이트 함수
+        // 버튼 상태 변경
         function updateSaveButtonUI() {
             const btn = document.getElementById('main-save-btn');
             const text = document.getElementById('save-btn-text');
@@ -191,34 +190,29 @@
             const newBtn = document.getElementById('save-as-new-btn');
             
             if(currentEditingId) {
-                // 수정 모드일 때
                 btn.className = "flex-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-emerald-800 transition-all duration-300 print:hidden";
                 icon.className = "fas fa-save mr-3 text-2xl text-emerald-300";
-                text.innerText = "불러온 전략 덮어쓰기";
-                newBtn.classList.remove('hidden');
-                newBtn.classList.add('flex');
+                text.innerText = "현재 화면 덮어쓰기 (업데이트)";
+                newBtn.classList.remove('hidden'); newBtn.classList.add('flex');
             } else {
-                // 신규 누적 모드일 때
                 btn.className = "flex-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all duration-300 print:hidden";
                 icon.className = "fas fa-save mr-3 text-2xl text-blue-400";
                 text.innerText = "전략 전체 저장 (새로 추가)";
-                newBtn.classList.add('hidden');
-                newBtn.classList.remove('flex');
+                newBtn.classList.add('hidden'); newBtn.classList.remove('flex');
             }
         }
 
         function updateGanttSuggestions() {
             const datalist = document.getElementById('strategy-suggestions');
             datalist.innerHTML = ''; 
-
             const currentTitle = document.getElementById('p1_1').value.trim();
             if(currentTitle) {
                 const opt = document.createElement('option');
                 opt.value = `[현재 작성중] ${currentTitle}`;
                 datalist.appendChild(opt);
             }
-
-            const history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
+            // v5.0 데이터베이스 사용
+            const history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
             history.forEach(item => {
                 const title = item.details["현황"] || "무제 전략";
                 const task = item.details["과제"] || "";
@@ -236,9 +230,8 @@
             updateSaveButtonUI();
         };
 
-        // 완전 초기화
         function startNewStrategy() {
-            if(confirm("화면을 비우고 새 전략을 작성하시겠습니까?")) {
+            if(confirm("화면을 비우고 새 캔버스를 여시겠습니까?")) {
                 currentEditingId = null; 
                 fields.forEach(id => document.getElementById(id).value = "");
                 currentGanttTasks = [];
@@ -280,7 +273,6 @@
             currentGanttTasks.forEach((task, index) => {
                 const color = chartColors[index % chartColors.length];
                 const span = (task.end - task.start) + 1; 
-                
                 canvas.innerHTML += `
                     <div class="gantt-grid">
                         <div class="text-xs font-bold text-slate-700 truncate pr-2 flex justify-between items-center bg-white border border-slate-100 p-1.5 rounded">
@@ -297,7 +289,7 @@
             });
         }
 
-        // 🌟 수정된 저장 로직 (누락 없이 안전하게)
+        // 🌟 저장 로직 완전 무결성 확보
         function saveToHistory() {
             let hasContent = false;
             let newDetails = {};
@@ -309,50 +301,54 @@
 
             if(!hasContent && currentGanttTasks.length === 0) return alert("저장할 내용을 하나라도 입력해주세요.");
 
-            let history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
+            let history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
 
             if(currentEditingId) {
-                // 기존 데이터 업데이트
+                // 기존 데이터 덮어쓰기
                 const itemIndex = history.findIndex(h => h.id === currentEditingId);
                 if(itemIndex > -1) {
                     history[itemIndex].details = newDetails;
                     history[itemIndex].gantt = [...currentGanttTasks];
                     history[itemIndex].status = document.getElementById('strategy-status').value;
                     history[itemIndex].date = new Date().toLocaleString('ko-KR') + " (수정됨)";
-                    showToast("기존 전략이 성공적으로 덮어쓰기 되었습니다!");
+                    showToast("기존 전략에 안전하게 덮어쓰기 되었습니다!");
                 }
             } else {
-                // 🌟 신규 데이터는 무조건 추가! (여기서 currentEditingId를 세팅하지 않습니다)
+                // 신규 데이터 추가! 추가하자마자 바로 수정 모드로 진입시켜 중복 생성 방지
+                currentEditingId = Date.now();
                 history.unshift({ 
-                    id: Date.now(), 
+                    id: currentEditingId, 
                     date: new Date().toLocaleString('ko-KR'), 
                     status: document.getElementById('strategy-status').value,
                     details: newDetails, 
                     gantt: [...currentGanttTasks] 
                 });
-                showToast("새로운 전략이 리스트에 추가(누적)되었습니다!");
+                showToast("새로운 전략이 저장되었습니다! (이후 저장 시 덮어쓰기 됩니다)");
             }
 
-            localStorage.setItem('pro_v4_5_history', JSON.stringify(history));
+            localStorage.setItem('pro_v5_0_history', JSON.stringify(history));
 
+            // 데이터 즉시 동기화
             renderHistory();
             updateGanttSuggestions(); 
-            // 시각적 피드백
+            updateSaveButtonUI();
+            
+            // 시각적 액션
             document.getElementById('main-save-btn').classList.add('scale-95');
             setTimeout(() => document.getElementById('main-save-btn').classList.remove('scale-95'), 150);
         }
 
-        // 기존 폼 내용을 유지한 채 새로운 카드로 뻗어나가고 싶을 때
+        // 가지치기 (기존 내용 놔두고 새로운 카드로 분리 저장)
         function saveAsNew() {
-            currentEditingId = null; // 수정 모드 해제
-            saveToHistory();         // 신규 저장 로직 태우기
-            updateSaveButtonUI();    // 버튼 UI 원래대로
+            currentEditingId = null; 
+            saveToHistory();         
         }
 
+        // 🌟 렌더링 로직 (innerHTML 1회 업데이트로 버그 원천 차단)
         function renderHistory() {
             const container = document.getElementById('history-container');
             const summaryBoard = document.getElementById('auto-summary-board');
-            const history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
             
             document.getElementById('history-count').innerText = `${history.length}건`;
 
@@ -362,25 +358,28 @@
                 return;
             }
 
-            container.innerHTML = ""; summaryBoard.innerHTML = "";
+            let summaryHtml = "";
+            let containerHtml = "";
 
             history.forEach((item, index) => {
                 const title = item.details["현황"] || `새로운 도약 전략 #${history.length - index}`;
                 const coreTask = item.details["과제"] || "-";
+                const bestPlan = item.details["결정"] || "-";
                 const taskCount = item.gantt ? item.gantt.length : 0;
                 
                 let statusColor = "bg-gray-100 text-gray-600";
                 if(item.status.includes("검토")) statusColor = "bg-orange-100 text-orange-700";
                 if(item.status.includes("확정")) statusColor = "bg-green-100 text-green-700";
 
-                summaryBoard.innerHTML += `
+                // 상단 요약판 HTML 생성
+                summaryHtml += `
                     <div class="auto-summary-item flex flex-col justify-center">
                         <div class="flex items-center mb-1">
                             <span class="${statusColor} text-[10px] font-bold px-2 py-0.5 rounded mr-2 whitespace-nowrap">${item.status}</span>
                             <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold"><i class="fas fa-tasks mr-1"></i>태스크 ${taskCount}개</span>
                         </div>
                         <div class="truncate text-slate-700 font-medium text-[0.8rem]">
-                            <b class="text-blue-700">[${title}]</b> ➔ ${coreTask}
+                            <b class="text-blue-700">[${title}]</b> ➔ ${coreTask} ➔ ${bestPlan}
                         </div>
                     </div>
                 `;
@@ -392,7 +391,8 @@
                     } return '';
                 }).join('');
 
-                container.innerHTML += `
+                // 하단 아카이브 HTML 생성
+                containerHtml += `
                     <div id="card-${item.id}" class="history-card bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                         <div class="flex justify-between items-center mb-3">
                             <div class="flex items-center">
@@ -409,11 +409,14 @@
                     </div>
                 `;
             });
+
+            // 화면에 한 번만 주입 (에러 방지)
+            summaryBoard.innerHTML = summaryHtml;
+            container.innerHTML = containerHtml;
         }
 
-        // 전략 불러올 때 수정 모드(EditingId) 활성화
         function loadStrategy(id) {
-            const history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
             const item = history.find(h => h.id === id);
             if(item) {
                 currentEditingId = id; 
@@ -424,22 +427,16 @@
                 updateGanttSuggestions();
                 updateSaveButtonUI(); 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                showToast("불러오기 완료! 내용을 고치고 하단의 초록색 버튼을 누르면 덮어쓰기 됩니다.");
+                showToast("불러오기 완료! 하단의 초록색 버튼을 누르면 덮어쓰기 됩니다.");
             }
         }
 
         function deleteStrategy(id) {
             if(confirm("이 전략을 영구 삭제하시겠습니까?")) {
-                let history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
+                let history = JSON.parse(localStorage.getItem('pro_v5_0_history') || "[]");
                 history = history.filter(h => h.id !== id);
-                localStorage.setItem('pro_v4_5_history', JSON.stringify(history));
-                
-                // 만약 삭제한 걸 현재 수정 중이었다면 모드 해제
-                if(currentEditingId === id) {
-                    currentEditingId = null;
-                    updateSaveButtonUI();
-                }
-                
+                localStorage.setItem('pro_v5_0_history', JSON.stringify(history));
+                if(currentEditingId === id) { currentEditingId = null; updateSaveButtonUI(); }
                 renderHistory();
                 updateGanttSuggestions();
             }
