@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT PRO v4.4 | 데이터 유지 완결판</title>
+    <title>RE:BOOT PRO v4.5 | 데이터 누적 및 덮어쓰기 완벽 지원</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -42,12 +42,12 @@
 
     <div class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end no-print">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v4.4</span></h1>
-            <p class="text-sm text-gray-500 mt-1 font-bold">저장 시 데이터 유지 및 덮어쓰기 완벽 지원</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v4.5</span></h1>
+            <p class="text-sm text-gray-500 mt-1 font-bold">전략 누적 저장 오류 완벽 수정 및 스마트 버튼 탑재</p>
         </div>
         <div class="flex gap-3 items-center">
             <button onclick="startNewStrategy()" class="bg-white border border-gray-300 hover:bg-gray-50 text-slate-700 px-5 py-2.5 rounded-lg font-bold shadow-sm transition-all">
-                <i class="fas fa-sync-alt mr-2"></i> 새 전략 작성 (비우기)
+                <i class="fas fa-sync-alt mr-2"></i> 새 캔버스 열기
             </button>
             <select id="strategy-status" class="bg-white border border-gray-300 text-slate-700 h-[45px] px-4 rounded-lg font-bold outline-none cursor-pointer shadow-sm">
                 <option value="초안 작성중">📝 초안 작성중</option>
@@ -128,8 +128,9 @@
                 <div class="box-wrapper"><div class="box-title">최적안 선정</div><textarea id="p3_1" class="h-[80px]" placeholder="예: 인터넷 판매 메인, SNS 협찬 병행"></textarea></div>
                 <div class="box-wrapper mb-4"><div class="box-title">세부 실행 계획 (Enter로 줄바꿈)</div><textarea id="p3_2" class="h-[80px]" placeholder="1. 상세페이지 제작&#10;2. 맘카페 체험단 모집&#10;3. SNS 타겟광고 세팅"></textarea></div>
                 
-                <button onclick="saveToHistory()" class="mt-auto w-full bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all print:hidden">
-                    <i class="fas fa-save mr-3 text-2xl text-blue-400"></i> 전략 전체 저장
+                <button id="main-save-btn" onclick="saveToHistory()" class="mt-auto w-full bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all duration-300 print:hidden">
+                    <i id="save-btn-icon" class="fas fa-save mr-3 text-2xl text-blue-400"></i> 
+                    <span id="save-btn-text">새로운 전략 추가 저장</span>
                 </button>
                 <div class="hidden print:flex bg-slate-100 text-slate-800 rounded-lg h-[92px] items-center justify-center font-black text-lg tracking-widest shadow-inner border border-slate-300">
                     RE:BOOT SPRINT PLAN
@@ -161,7 +162,7 @@
         const labels = ['현황', '원인', '과제', '목표', '대안', '평가', '결정', '계획', '메모'];
 
         let currentGanttTasks = [];
-        let currentEditingId = null; // 🌟 현재 덮어쓰기할 전략의 ID 추적
+        let currentEditingId = null; // 수정 모드 추적용 변수
 
         const chartColors = ['bg-blue-500', 'bg-indigo-500', 'bg-emerald-500', 'bg-purple-500', 'bg-cyan-600'];
 
@@ -176,6 +177,29 @@
             }, 3000);
         }
 
+        // 🌟 스마트 버튼 UI 업데이트 함수
+        function updateSaveButtonUI() {
+            const btn = document.getElementById('main-save-btn');
+            const text = document.getElementById('save-btn-text');
+            const icon = document.getElementById('save-btn-icon');
+            
+            if(currentEditingId) {
+                // 수정(덮어쓰기) 모드일 때는 초록색으로 변신
+                btn.classList.replace('bg-slate-800', 'bg-emerald-700');
+                btn.classList.replace('hover:bg-slate-900', 'hover:bg-emerald-800');
+                btn.classList.replace('border-slate-900', 'border-emerald-800');
+                icon.classList.replace('text-blue-400', 'text-emerald-300');
+                text.innerText = "현재 전략 덮어쓰기 (수정)";
+            } else {
+                // 신규 추가 모드일 때는 딥 슬레이트(남색)
+                btn.classList.replace('bg-emerald-700', 'bg-slate-800');
+                btn.classList.replace('hover:bg-emerald-800', 'hover:bg-slate-900');
+                btn.classList.replace('border-emerald-800', 'border-slate-900');
+                icon.classList.replace('text-emerald-300', 'text-blue-400');
+                text.innerText = "새로운 전략 추가 저장";
+            }
+        }
+
         function updateGanttSuggestions() {
             const datalist = document.getElementById('strategy-suggestions');
             datalist.innerHTML = ''; 
@@ -187,7 +211,7 @@
                 datalist.appendChild(opt);
             }
 
-            const history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
             history.forEach(item => {
                 const title = item.details["현황"] || "무제 전략";
                 const task = item.details["과제"] || "";
@@ -202,17 +226,19 @@
         window.onload = () => {
             renderHistory();
             updateGanttSuggestions(); 
+            updateSaveButtonUI();
         };
 
-        // 🌟 새 캔버스 열기 기능
+        // 새 캔버스 열기
         function startNewStrategy() {
             if(confirm("화면을 비우고 새 전략을 작성하시겠습니까? (저장하지 않은 내용은 사라집니다)")) {
-                currentEditingId = null; // 신규 작성 모드로 전환
+                currentEditingId = null; // 🌟 신규 모드로 확실히 전환
                 fields.forEach(id => document.getElementById(id).value = "");
                 currentGanttTasks = [];
                 document.getElementById('strategy-status').value = "초안 작성중";
                 drawGantt();
                 updateGanttSuggestions();
+                updateSaveButtonUI(); // 버튼 원래대로
                 showToast("새 캔버스가 준비되었습니다.");
             }
         }
@@ -264,7 +290,7 @@
             });
         }
 
-        // 🌟 저장 로직 전면 개편 (덮어쓰기 지원 및 화면 유지)
+        // 🌟 수정된 핵심 로직: 새 저장은 누적, 수정 모드일 때만 덮어쓰기!
         function saveToHistory() {
             let hasContent = false;
             let newDetails = {};
@@ -276,10 +302,10 @@
 
             if(!hasContent && currentGanttTasks.length === 0) return alert("저장할 내용을 하나라도 입력해주세요.");
 
-            let history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
+            let history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
 
             if(currentEditingId) {
-                // 수정(덮어쓰기) 모드
+                // [기존 전략 덮어쓰기]
                 const itemIndex = history.findIndex(h => h.id === currentEditingId);
                 if(itemIndex > -1) {
                     history[itemIndex].details = newDetails;
@@ -289,21 +315,19 @@
                     showToast("기존 전략이 성공적으로 업데이트(덮어쓰기) 되었습니다!");
                 }
             } else {
-                // 신규 저장 모드
-                currentEditingId = Date.now(); // 방금 저장한 것을 덮어쓰기 모드로 즉시 전환
+                // [새로운 전략 누적 저장] - 여기서 currentEditingId를 세팅하지 않으므로 계속 추가됨!
                 history.unshift({ 
-                    id: currentEditingId, 
+                    id: Date.now(), 
                     date: new Date().toLocaleString('ko-KR'), 
                     status: document.getElementById('strategy-status').value,
                     details: newDetails, 
                     gantt: [...currentGanttTasks] 
                 });
-                showToast("새로운 전략이 저장되었습니다! (계속 수정 가능합니다)");
+                showToast("새로운 전략이 리스트에 추가되었습니다!");
             }
 
-            localStorage.setItem('pro_v4_4_history', JSON.stringify(history));
+            localStorage.setItem('pro_v4_5_history', JSON.stringify(history));
 
-            // 🌟 주의: 여기서 캔버스를 초기화하지 않음 (데이터 유지!)
             renderHistory();
             updateGanttSuggestions(); 
         }
@@ -311,7 +335,7 @@
         function renderHistory() {
             const container = document.getElementById('history-container');
             const summaryBoard = document.getElementById('auto-summary-board');
-            const history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
             
             document.getElementById('history-count').innerText = `${history.length}건`;
 
@@ -359,7 +383,7 @@
                                 <h3 class="text-md font-extrabold text-gray-900">${title}</h3>
                             </div>
                             <div class="flex gap-2 no-print">
-                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded font-bold transition">불러오기(수정)</button>
+                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded font-bold transition">불러오기(수정)</button>
                                 <button onclick="exportSingleCard(${item.id})" class="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1.5 rounded font-bold transition">PDF 다운</button>
                                 <button onclick="deleteStrategy(${item.id})" class="text-xs text-red-400 hover:text-red-600 p-1.5"><i class="fas fa-trash"></i></button>
                             </div>
@@ -370,30 +394,33 @@
             });
         }
 
-        // 🌟 전략 불러올 때 수정 모드로 전환되도록 세팅
+        // 불러오기 시 덮어쓰기 모드로 전환
         function loadStrategy(id) {
-            const history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
             const item = history.find(h => h.id === id);
             if(item) {
-                currentEditingId = id; // 이 ID를 기억해뒀다가 덮어쓰기!
+                currentEditingId = id; // 🌟 덮어쓰기할 ID 기억!
                 fields.forEach((fieldId, idx) => { document.getElementById(fieldId).value = item.details[labels[idx]] || ""; });
                 document.getElementById('strategy-status').value = item.status || "초안 작성중";
                 currentGanttTasks = item.gantt ? [...item.gantt] : [];
                 drawGantt();
                 updateGanttSuggestions();
+                updateSaveButtonUI(); // 버튼 초록색으로 변경!
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                showToast("불러오기 완료! 내용을 수정하고 저장하면 덮어쓰기 됩니다.");
+                showToast("불러오기 완료! 내용을 수정하고 버튼을 누르면 기존 내용이 덮어쓰기 됩니다.");
             }
         }
 
         function deleteStrategy(id) {
             if(confirm("이 전략을 영구 삭제하시겠습니까?")) {
-                let history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
+                let history = JSON.parse(localStorage.getItem('pro_v4_5_history') || "[]");
                 history = history.filter(h => h.id !== id);
-                localStorage.setItem('pro_v4_4_history', JSON.stringify(history));
+                localStorage.setItem('pro_v4_5_history', JSON.stringify(history));
                 
-                // 만약 삭제한 걸 현재 캔버스에서 수정 중이었다면 신규 모드로 변경
-                if(currentEditingId === id) currentEditingId = null; 
+                if(currentEditingId === id) {
+                    currentEditingId = null;
+                    updateSaveButtonUI();
+                }
                 
                 renderHistory();
                 updateGanttSuggestions();
