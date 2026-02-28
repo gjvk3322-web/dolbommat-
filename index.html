@@ -2,104 +2,122 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전략 프로세스 캔버스 | RE:BOOT</title>
+    <title>RE:BOOT | 전략 프로세스 매니저</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap');
         body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; }
-        .box-title { background-color: #1e3a8a; color: white; padding: 8px; text-align: center; font-weight: bold; border-radius: 6px 6px 0 0; }
-        .content-box { background: white; border: 1px solid #cbd5e1; border-top: none; padding: 12px; min-height: 120px; border-radius: 0 0 6px 6px; shadow: sm; }
-        textarea { width: 100%; height: 100px; border: none; outline: none; resize: none; font-size: 14px; line-height: 1.6; color: #334155; }
-        .step-header { background-color: #475569; color: white; py: 3; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 20px; }
+        /* PDF 출력 시 용지 밖으로 나가지 않도록 폭 고정 */
+        .pdf-page { width: 1100px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; }
+        .box-title { background-color: #1e3a8a; color: white; padding: 8px; text-align: center; font-weight: bold; border-radius: 4px 4px 0 0; font-size: 14px; }
+        .content-box { border: 1px solid #cbd5e1; border-top: none; padding: 10px; min-height: 110px; border-radius: 0 0 4px 4px; background: #fff; }
+        textarea { width: 100%; height: 90px; border: none; outline: none; resize: none; font-size: 14px; color: #334155; }
+        .step-header { color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 6px; margin-bottom: 15px; }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="p-6">
 
-    <div id="report-area" class="max-w-6xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-        <h1 class="text-3xl font-bold text-center mb-4 text-slate-800">📊 기업 도약 전략 프로세스 캔버스</h1>
-        <p class="text-center text-slate-500 mb-10 text-sm">작성하신 후 PDF로 저장하여 돌봄매트 AI에게 전달해주세요.</p>
+    <div class="max-w-[1100px] mx-auto">
+        <div id="report-area" class="pdf-page shadow-2xl border border-slate-200">
+            <h1 class="text-3xl font-bold text-center mb-2 text-slate-800">기업 도약 전략 프로세스 캔버스</h1>
+            <p class="text-center text-slate-500 mb-8 text-sm">작성하신 후 PDF로 저장하여 돌봄매트 AI에게 전달해주세요.</p>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            <div>
-                <div class="step-header bg-blue-700">STEP 01. 문제 인식</div>
-                <div class="space-y-6">
-                    <div>
-                        <div class="box-title">문제 파악</div>
-                        <div class="content-box"><textarea id="p1_1" placeholder="• 거시적 관점 현황&#10;• 문제로 야기될 미래 전망"></textarea></div>
-                    </div>
-                    <div>
-                        <div class="box-title">원인 규명</div>
-                        <div class="content-box"><textarea id="p1_2" placeholder="• 차이 분석(Gap Analysis)&#10;• 인과 관계 분석"></textarea></div>
-                    </div>
-                    <div>
-                        <div class="box-title">핵심 과제 도출</div>
-                        <div class="content-box"><textarea id="p1_3" placeholder="• 해결해야 할 과제 선별&#10;• 우선순위 고려"></textarea></div>
-                    </div>
-                </div>
+            <div id="summary-list" class="mb-10 p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg hidden">
+                <h3 class="font-bold text-blue-800 mb-2 border-b border-blue-200 pb-1">✅ 확인된 전략 요약</h3>
+                <div id="summary-content" class="text-sm text-slate-600 space-y-1"></div>
             </div>
 
-            <div>
-                <div class="step-header bg-emerald-700">STEP 02. 해결 방안 탐색</div>
-                <div class="space-y-6">
-                    <div>
-                        <div class="box-title">해결 목표 수립</div>
-                        <div class="content-box"><textarea id="p2_1" placeholder="• 핵심 과제 실행 목표&#10;• SMART 기준"></textarea></div>
-                    </div>
-                    <div>
-                        <div class="box-title">해결 방안 탐색</div>
-                        <div class="content-box"><textarea id="p2_2" placeholder="• 다양한 해결 방안 도출&#10;• 전문성/창의성/경험 필요"></textarea></div>
-                    </div>
-                    <div>
-                        <div class="box-title">대안별 평가</div>
-                        <div class="content-box"><textarea id="p2_3" placeholder="• 목표에 따른 평가 기준 마련&#10;• 객관적인 정량 평가"></textarea></div>
+            <div class="grid grid-cols-3 gap-6">
+                <div>
+                    <div class="step-header bg-blue-800">STEP 01. 문제 인식</div>
+                    <div class="space-y-4">
+                        <div><div class="box-title">문제 파악</div><div class="content-box"><textarea id="p1_1" placeholder="• 거시적 관점 현황"></textarea></div></div>
+                        <div><div class="box-title">원인 규명</div><div class="content-box"><textarea id="p1_2" placeholder="• 차이 분석(Gap Analysis)"></textarea></div></div>
+                        <div><div class="box-title">핵심 과제 도출</div><div class="content-box"><textarea id="p1_3" placeholder="• 해결해야 할 과제 선별"></textarea></div></div>
                     </div>
                 </div>
-            </div>
-
-            <div>
-                <div class="step-header bg-orange-700">STEP 03. 선정 및 실행</div>
-                <div class="space-y-6">
-                    <div>
-                        <div class="box-title">최적안 선정</div>
-                        <div class="content-box"><textarea id="p3_1" placeholder="• 대안별 평가 결과 기반&#10;• 목표 달성 의지, 여건 고려"></textarea></div>
+                <div>
+                    <div class="step-header bg-emerald-700">STEP 02. 해결 방안 탐색</div>
+                    <div class="space-y-4">
+                        <div><div class="box-title">해결 목표 수립</div><div class="content-box"><textarea id="p2_1" placeholder="• SMART 기준 목표"></textarea></div></div>
+                        <div><div class="box-title">해결 방안 탐색</div><div class="content-box"><textarea id="p2_2" placeholder="• 창의적 대안 도출"></textarea></div></div>
+                        <div><div class="box-title">대안별 평가</div><div class="content-box"><textarea id="p2_3" placeholder="• 객관적 정량 평가"></textarea></div></div>
                     </div>
-                    <div>
-                        <div class="box-title">실행 계획 수립</div>
-                        <div class="content-box"><textarea id="p3_2" placeholder="• 구체적인 세부 실행 계획&#10;• 시나리오별 비상 계획"></textarea></div>
-                    </div>
-                    <div class="bg-slate-100 border-2 border-dashed border-slate-300 rounded-lg h-32 flex items-center justify-center">
-                        <span class="text-slate-400 font-bold text-lg">해결 방안 실행</span>
+                </div>
+                <div>
+                    <div class="step-header bg-orange-600">STEP 03. 선정 및 실행</div>
+                    <div class="space-y-4">
+                        <div><div class="box-title">최적안 선정</div><div class="content-box"><textarea id="p3_1" placeholder="• 최종 선택 근거"></textarea></div></div>
+                        <div><div class="box-title">실행 계획 수립</div><div class="content-box"><textarea id="p3_2" placeholder="• 세부 액션 플랜"></textarea></div></div>
+                        <div class="bg-slate-900 text-white rounded-lg h-[130px] flex items-center justify-center font-bold italic text-lg shadow-inner">해결 방안 실행</div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="max-w-6xl mx-auto mt-8 flex gap-4">
-        <button onclick="downloadPDF()" class="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center">
-            <i class="fas fa-file-pdf mr-3"></i> PDF 보고서 다운로드
-        </button>
-        <button onclick="location.reload()" class="w-32 bg-white border border-slate-300 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-50">
-            초기화
-        </button>
+        <div class="mt-8 flex gap-3 justify-center no-print">
+            <button onclick="confirmContent()" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl font-bold shadow-lg transition-all">내용 확인 및 요약 생성</button>
+            <button onclick="downloadPDF()" class="bg-slate-800 hover:bg-black text-white px-10 py-4 rounded-xl font-bold shadow-lg transition-all">PDF 결과물 저장</button>
+            <button onclick="resetAll()" class="bg-white text-slate-400 px-6 py-4 rounded-xl font-bold border border-slate-200 hover:bg-red-50 hover:text-red-500 transition-all">초기화</button>
+        </div>
     </div>
 
     <script>
+        // 자동 저장 기능
+        const fields = ['p1_1', 'p1_2', 'p1_3', 'p2_1', 'p2_2', 'p2_3', 'p3_1', 'p3_2'];
+        window.onload = () => {
+            fields.forEach(id => {
+                const val = localStorage.getItem(id);
+                if (val) document.getElementById(id).value = val;
+                document.getElementById(id).addEventListener('input', (e) => localStorage.setItem(id, e.target.value));
+            });
+            updateSummary(); // 기존 요약 있으면 표시
+        };
+
+        // 내용 확인 버튼 클릭 시 요약 리스트 생성
+        function confirmContent() {
+            const summaryDiv = document.getElementById('summary-list');
+            const contentDiv = document.getElementById('summary-content');
+            let html = "";
+            
+            const labels = ["문제파악", "원인규명", "핵심과제", "목표수립", "방안탐색", "대안평가", "최적안", "실행계획"];
+            fields.forEach((id, idx) => {
+                const val = document.getElementById(id).value.trim();
+                if(val) html += `<p><strong>${labels[idx]}:</strong> ${val.substring(0, 50)}${val.length > 50 ? '...' : ''}</p>`;
+            });
+
+            if(html) {
+                contentDiv.innerHTML = html;
+                summaryDiv.classList.remove('hidden');
+                alert("내용이 요약 리스트에 등록되었습니다.");
+            } else {
+                alert("내용을 먼저 입력해주세요.");
+            }
+        }
+
+        function updateSummary() {
+            // 새로고침 시에도 요약이 보이게 하려면 여기에 로직 추가 가능
+        }
+
         function downloadPDF() {
             const element = document.getElementById('report-area');
-            const options = {
-                margin: 10,
-                filename: 'REBOOT_전략보고서.pdf',
+            const opt = {
+                margin: 5,
+                filename: 'REBOOT_Strategy_Report.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
-            html2pdf().set(options).from(element).save();
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function resetAll() {
+            if(confirm("모든 데이터를 삭제할까요?")) {
+                localStorage.clear();
+                location.reload();
+            }
         }
     </script>
-    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
 </body>
 </html>
