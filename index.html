@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT PRO v4.2 | 8주 스프린트 마스터플랜</title>
+    <title>RE:BOOT PRO v4.3 | 8주 마스터플랜</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -14,7 +14,7 @@
         
         .dashboard-container { max-width: 1400px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .section-title { font-size: 1.1rem; font-weight: 800; color: #1e293b; margin-bottom: 12px; display: flex; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-        .section-title i { color: #ef4444; margin-right: 8px; }
+        .section-title i { color: #3b82f6; margin-right: 8px; }
 
         .step-col { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
         .step-header { font-size: 1rem; font-weight: 800; text-align: center; padding: 10px; border-radius: 8px; margin-bottom: 16px; color: white; }
@@ -28,7 +28,7 @@
         .memo-pad { background-color: #fef9c3; border: 1px solid #fde047; box-shadow: inset 0 0 10px rgba(250, 204, 21, 0.2); }
         .memo-pad textarea { height: calc(100% - 40px); background: repeating-linear-gradient(transparent, transparent 27px, #fef08a 28px); line-height: 28px; padding-top: 4px; color: #854d0e; font-weight: 600; }
         
-        .history-card { border-left: 5px solid #ef4444; page-break-inside: avoid; }
+        .history-card { border-left: 5px solid #3b82f6; page-break-inside: avoid; }
         
         .auto-summary-list { height: 160px; overflow-y: auto; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
         .auto-summary-item { font-size: 0.85rem; padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
@@ -43,8 +43,8 @@
 
     <div class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end no-print">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-red-500">PRO v4.2</span></h1>
-            <p class="text-sm text-gray-500 mt-1 font-bold">8주 안에 승부를 내는 초단기 스프린트 마스터플랜</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v4.3</span></h1>
+            <p class="text-sm text-gray-500 mt-1 font-bold">8주 스프린트 마스터플랜 (데이터 연동 및 UI 최적화)</p>
         </div>
         <div class="flex gap-3 items-center">
             <select id="strategy-status" class="bg-white border border-gray-300 text-slate-700 h-[45px] px-4 rounded-lg font-bold outline-none cursor-pointer shadow-sm">
@@ -62,31 +62,31 @@
         
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div class="col-span-1 lg:col-span-1">
-                <div class="section-title"><i class="fas fa-list-check text-blue-500"></i> 전략 핵심 요약 (자동)</div>
+                <div class="section-title"><i class="fas fa-list-check"></i> 전략 핵심 요약 (자동)</div>
                 <div id="auto-summary-board" class="auto-summary-list">
                     <div class="text-slate-400 text-sm text-center mt-12">전략을 저장하면 여기에 요약이 누적됩니다.</div>
                 </div>
             </div>
 
             <div class="col-span-1 lg:col-span-3 flex flex-col">
-                <div class="section-title"><i class="fas fa-stopwatch text-red-500"></i> 8주 스프린트 로드맵 (Gantt Chart)</div>
+                <div class="section-title"><i class="fas fa-stopwatch text-blue-600"></i> 8주 스프린트 로드맵 (Gantt Chart)</div>
                 
                 <div class="bg-white border border-slate-300 rounded-lg p-4 flex-1 shadow-sm flex flex-col">
-                    <div class="flex gap-2 mb-4 no-print bg-red-50 p-2 rounded-lg border border-red-200">
-                        <input type="text" id="g-name" list="strategy-suggestions" class="gantt-input flex-1 focus:border-red-500 font-bold text-red-900" placeholder="▼ 클릭하여 아래에서 작성한 핵심 전략/실행계획을 선택하세요">
+                    <div class="flex gap-2 mb-4 no-print bg-blue-50 p-2 rounded-lg border border-blue-200">
+                        <input type="text" id="g-name" list="strategy-suggestions" class="gantt-input flex-1 focus:border-blue-500 font-bold text-blue-900" placeholder="▼ 클릭하여 왼쪽의 [전략 핵심 요약] 내용을 선택하세요">
                         <datalist id="strategy-suggestions"></datalist>
 
-                        <div class="flex items-center text-sm font-bold text-red-800 px-2">시작:</div>
-                        <select id="g-start" class="gantt-input bg-white cursor-pointer font-bold text-red-700">
+                        <div class="flex items-center text-sm font-bold text-blue-800 px-2">시작:</div>
+                        <select id="g-start" class="gantt-input bg-white cursor-pointer font-bold text-blue-700">
                             <option value="1">1주차</option><option value="2">2주차</option><option value="3">3주차</option><option value="4">4주차</option>
                             <option value="5">5주차</option><option value="6">6주차</option><option value="7">7주차</option><option value="8">8주차</option>
                         </select>
-                        <div class="flex items-center text-sm font-bold text-red-800 px-2">종료:</div>
-                        <select id="g-end" class="gantt-input bg-white cursor-pointer font-bold text-red-700">
+                        <div class="flex items-center text-sm font-bold text-blue-800 px-2">종료:</div>
+                        <select id="g-end" class="gantt-input bg-white cursor-pointer font-bold text-blue-700">
                             <option value="1">1주차</option><option value="2">2주차</option><option value="3">3주차</option><option value="4">4주차</option>
                             <option value="5">5주차</option><option value="6">6주차</option><option value="7">7주차</option><option value="8">8주차</option>
                         </select>
-                        <button onclick="addGanttTask()" class="bg-red-500 hover:bg-red-600 text-white px-5 rounded-lg font-bold transition-colors">
+                        <button onclick="addGanttTask()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-lg font-bold transition-colors">
                             <i class="fas fa-plus mr-1"></i> 전략 등록
                         </button>
                     </div>
@@ -95,10 +95,9 @@
                         <div class="grid grid-cols-[200px_1fr] gap-10 bg-slate-100 border-b border-slate-200 p-2 pr-4">
                             <div class="text-xs font-bold text-slate-500 text-center flex items-center justify-center">핵심 전략 요약 (Task)</div>
                             <div class="grid grid-cols-8 text-center text-[0.75rem] font-extrabold text-slate-600">
-                                <div>W1</div><div>W2</div><div>W3</div><div>W4</div><div class="text-red-500">W5</div><div class="text-red-500">W6</div><div class="text-red-500">W7</div><div class="text-red-500">W8</div>
+                                <div>W1</div><div>W2</div><div>W3</div><div>W4</div><div class="text-blue-500">W5</div><div class="text-blue-500">W6</div><div class="text-blue-500">W7</div><div class="text-blue-500">W8</div>
                             </div>
                         </div>
-                        
                         <div id="gantt-canvas" class="p-3 min-h-[100px]">
                             <div class="text-slate-400 text-center text-xs mt-6">상단의 [전략 등록] 버튼을 눌러 8주 일정을 채워보세요.</div>
                         </div>
@@ -127,10 +126,10 @@
                 <div class="box-wrapper"><div class="box-title">최적안 선정</div><textarea id="p3_1" class="h-[80px]" placeholder="예: 인터넷 판매 메인, SNS 협찬 병행"></textarea></div>
                 <div class="box-wrapper mb-4"><div class="box-title">세부 실행 계획 (Enter로 줄바꿈)</div><textarea id="p3_2" class="h-[80px]" placeholder="1. 상세페이지 제작&#10;2. 맘카페 체험단 모집&#10;3. SNS 타겟광고 세팅"></textarea></div>
                 
-                <button onclick="saveToHistory()" class="mt-auto w-full bg-red-600 hover:bg-red-700 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-red-800 transition-all print:hidden">
-                    <i class="fas fa-save mr-3 text-2xl"></i> 전략 전체 저장
+                <button onclick="saveToHistory()" class="mt-auto w-full bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-xl tracking-wider shadow-xl border border-slate-900 transition-all print:hidden">
+                    <i class="fas fa-save mr-3 text-2xl text-blue-400"></i> 전략 전체 저장
                 </button>
-                <div class="hidden print:flex bg-slate-900 text-white rounded-lg h-[92px] items-center justify-center font-black text-lg tracking-widest shadow-inner border border-slate-800">
+                <div class="hidden print:flex bg-slate-100 text-slate-800 rounded-lg h-[92px] items-center justify-center font-black text-lg tracking-widest shadow-inner border border-slate-300">
                     RE:BOOT SPRINT PLAN
                 </div>
             </div>
@@ -148,7 +147,7 @@
     <div class="max-w-[1400px] mx-auto pb-20">
         <h2 class="text-xl font-extrabold text-gray-800 mb-4 flex items-center">
             <i class="fas fa-layer-group text-blue-600 mr-3"></i> 8주 스프린트 아카이브
-            <span id="history-count" class="ml-3 bg-red-100 text-red-700 text-sm font-bold px-3 py-1 rounded-full">0건</span>
+            <span id="history-count" class="ml-3 bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">0건</span>
         </h2>
         <div id="history-container" class="space-y-4"></div>
     </div>
@@ -158,31 +157,47 @@
         const labels = ['현황', '원인', '과제', '목표', '대안', '평가', '결정', '계획', '메모'];
 
         let currentGanttTasks = [];
-        const chartColors = ['bg-red-500', 'bg-blue-600', 'bg-emerald-600', 'bg-purple-600', 'bg-orange-500'];
+        const chartColors = ['bg-blue-500', 'bg-indigo-500', 'bg-emerald-500', 'bg-purple-500', 'bg-cyan-600'];
 
-        document.getElementById('p3_2').addEventListener('input', function() {
-            const planText = this.value;
+        // 🌟 [핵심 기능] 요약 데이터(현재 작성중인 제목 + 저장된 리스트)를 간트 차트 선택지에 연결
+        function updateGanttSuggestions() {
             const datalist = document.getElementById('strategy-suggestions');
             datalist.innerHTML = ''; 
-            
-            if(planText) {
-                const lines = planText.split('\n').map(line => line.replace(/^[0-9\.\-\*]+\s*/, '').trim()).filter(line => line.length > 0);
-                lines.forEach(line => {
-                    const option = document.createElement('option');
-                    option.value = line;
-                    datalist.appendChild(option);
-                });
-            }
-        });
 
-        window.onload = () => renderHistory();
+            // 1. 현재 캔버스에 적고 있는 '현황(제목)' 추가
+            const currentTitle = document.getElementById('p1_1').value.trim();
+            if(currentTitle) {
+                const opt = document.createElement('option');
+                opt.value = `[현재 작성중] ${currentTitle}`;
+                datalist.appendChild(opt);
+            }
+
+            // 2. 저장된 히스토리(전략 핵심 요약) 목록 추가
+            const history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
+            history.forEach(item => {
+                const title = item.details["현황"] || "무제 전략";
+                const task = item.details["과제"] || "";
+                const opt = document.createElement('option');
+                // 요약 게시판에 뜨는 흐름 그대로 선택지에 제공
+                opt.value = `${title} ➔ ${task}`;
+                datalist.appendChild(opt);
+            });
+        }
+
+        // 현황(제목)을 입력할 때마다 선택지 업데이트
+        document.getElementById('p1_1').addEventListener('input', updateGanttSuggestions);
+
+        window.onload = () => {
+            renderHistory();
+            updateGanttSuggestions(); // 초기 선택지 세팅
+        };
 
         function addGanttTask() {
             const name = document.getElementById('g-name').value.trim();
             const start = parseInt(document.getElementById('g-start').value);
             const end = parseInt(document.getElementById('g-end').value);
 
-            if(!name) return alert("전략 요약을 선택하거나 입력해주세요.");
+            if(!name) return alert("왼쪽 전략 요약을 선택하거나 직접 입력해주세요.");
             if(start > end) return alert("시작 주차가 종료 주차보다 늦을 수 없습니다!");
 
             currentGanttTasks.push({ id: Date.now(), name, start, end });
@@ -214,7 +229,7 @@
                     <div class="gantt-grid">
                         <div class="text-xs font-bold text-slate-700 truncate pr-2 flex justify-between items-center bg-white border border-slate-100 p-1.5 rounded">
                             <span class="truncate" title="${task.name}">${task.name}</span>
-                            <i class="fas fa-times text-red-300 hover:text-red-500 cursor-pointer no-print ml-1" onclick="removeGanttTask(${task.id})"></i>
+                            <i class="fas fa-times text-slate-300 hover:text-red-500 cursor-pointer no-print ml-1" onclick="removeGanttTask(${task.id})"></i>
                         </div>
                         <div class="gantt-track">
                             <div class="gantt-bar ${color}" style="grid-column: ${task.start} / span ${span};">
@@ -240,23 +255,23 @@
 
             if(!hasContent && currentGanttTasks.length === 0) return alert("저장할 내용을 하나라도 입력해주세요.");
 
-            let history = JSON.parse(localStorage.getItem('pro_v4_2_history') || "[]");
+            let history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
             history.unshift(currentStrategy);
-            localStorage.setItem('pro_v4_2_history', JSON.stringify(history));
+            localStorage.setItem('pro_v4_3_history', JSON.stringify(history));
 
             fields.forEach(id => document.getElementById(id).value = "");
             currentGanttTasks = [];
             drawGantt();
             renderHistory();
+            updateGanttSuggestions(); // 새 전략이 추가되었으므로 선택지 갱신
             
-            // 시각적 피드백
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
         function renderHistory() {
             const container = document.getElementById('history-container');
             const summaryBoard = document.getElementById('auto-summary-board');
-            const history = JSON.parse(localStorage.getItem('pro_v4_2_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
             
             document.getElementById('history-count').innerText = `${history.length}건`;
 
@@ -282,10 +297,10 @@
                     <div class="auto-summary-item flex flex-col justify-center">
                         <div class="flex items-center mb-1">
                             <span class="${statusColor} text-[10px] font-bold px-2 py-0.5 rounded mr-2 whitespace-nowrap">${item.status}</span>
-                            <span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-bold"><i class="fas fa-bolt mr-1"></i>8주 태스크 ${taskCount}개</span>
+                            <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold"><i class="fas fa-tasks mr-1"></i>태스크 ${taskCount}개</span>
                         </div>
                         <div class="truncate text-slate-700 font-medium text-[0.8rem]">
-                            <b class="text-blue-700">[${title}]</b> ➔ ${coreTask} ➔ ${bestPlan}
+                            <b class="text-blue-700">[${title}]</b> ➔ ${coreTask}
                         </div>
                     </div>
                 `;
@@ -317,14 +332,14 @@
         }
 
         function loadStrategy(id) {
-            const history = JSON.parse(localStorage.getItem('pro_v4_2_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
             const item = history.find(h => h.id === id);
             if(item) {
                 fields.forEach((fieldId, idx) => { document.getElementById(fieldId).value = item.details[labels[idx]] || ""; });
                 document.getElementById('strategy-status').value = item.status || "초안 작성중";
                 currentGanttTasks = item.gantt ? [...item.gantt] : [];
                 drawGantt();
-                document.getElementById('p3_2').dispatchEvent(new Event('input'));
+                updateGanttSuggestions();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 alert("불러오기 완료! 상단 캔버스에서 수정 후 다시 [전략 전체 저장]을 눌러주세요.");
             }
@@ -332,10 +347,11 @@
 
         function deleteStrategy(id) {
             if(confirm("이 전략을 영구 삭제하시겠습니까?")) {
-                let history = JSON.parse(localStorage.getItem('pro_v4_2_history') || "[]");
+                let history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
                 history = history.filter(h => h.id !== id);
-                localStorage.setItem('pro_v4_2_history', JSON.stringify(history));
+                localStorage.setItem('pro_v4_3_history', JSON.stringify(history));
                 renderHistory();
+                updateGanttSuggestions();
             }
         }
 
