@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RE:BOOT - 기업 도약 프로세스 매니저</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .step-card { transition: all 0.3s ease; border-left: 5px solid #e5e7eb; }
+        .step-card:hover { transform: translateY(-5px); shadow: lg; }
+        .active-step { border-left-color: #2563eb; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <header class="bg-blue-900 text-white py-8 px-6 shadow-md text-center">
+        <h1 class="text-3xl font-bold tracking-tight">🚀 Project: RE-BOOT</h1>
+        <p class="mt-2 text-blue-200">회사의 체질 개선을 위한 3단계 문제 해결 프로세스</p>
+    </header>
+
+    <main class="max-w-5xl mx-auto py-10 px-4">
+        
+        <section class="mb-10">
+            <h2 class="text-xl font-bold mb-4 flex items-center text-blue-700">
+                <span class="bg-blue-700 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2 text-sm">1</span>
+                문제 인식 (현상 파악 & 원인 규명)
+            </h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
+                    <label class="block font-semibold mb-2 text-sm text-gray-600">현재 상황 (As-Is)</label>
+                    <textarea id="issue_desc" class="w-full h-32 p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="거시적 관점에서 현재의 위기 상황을 적어주세요."></textarea>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
+                    <label class="block font-semibold mb-2 text-sm text-gray-600">원인 분석 (Gap 분석)</label>
+                    <textarea id="cause_analysis" class="w-full h-32 p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="목표와 현실의 차이가 발생하는 진짜 원인은 무엇인가요?"></textarea>
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
+                    <label class="block font-semibold mb-2 text-sm text-gray-600">핵심 과제 (Must-Do)</label>
+                    <textarea id="core_task" class="w-full h-32 p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="가장 먼저 해결해야 할 우선순위 과제는?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-xl font-bold mb-4 flex items-center text-green-700">
+                <span class="bg-green-700 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2 text-sm">2</span>
+                해결 방안 탐색 (전략 수립)
+            </h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
+                    <label class="block font-semibold mb-2 text-sm text-gray-600">SMART 목표 수립</label>
+                    <input type="text" id="smart_goal" class="w-full p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-green-500" placeholder="구체적이고 측정 가능한 목표를 입력하세요.">
+                </div>
+                <div class="bg-white p-5 rounded-lg shadow-sm step-card">
+                    <label class="block font-semibold mb-2 text-sm text-gray-600">해결 대안 브레인스토밍</label>
+                    <textarea id="solutions" class="w-full h-24 p-3 border rounded text-sm outline-none focus:ring-2 focus:ring-green-500" placeholder="전문성/창의성을 발휘한 다양한 방안들..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-xl font-bold mb-4 flex items-center text-orange-700">
+                <span class="bg-orange-700 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2 text-sm">3</span>
+                실행 계획 (Action Plan)
+            </h2>
+            <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500">
+                <div class="mb-4">
+                    <label class="block font-bold text-gray-700 mb-2">최종 선정 방안 & 시나리오</label>
+                    <textarea id="final_plan" class="w-full h-32 p-3 border rounded outline-none focus:ring-2 focus:ring-orange-500" placeholder="위험 요소(비상 계획)를 포함한 세부 실행 계획을 수립하세요."></textarea>
+                </div>
+                <button onclick="savePlan()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-lg shadow-lg transition duration-300">
+                    도약 계획서(RE-BOOT REPORT) 확정하기
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function savePlan() {
+            const plan = {
+                issue: document.getElementById('issue_desc').value,
+                cause: document.getElementById('cause_analysis').value,
+                core: document.getElementById('core_task').value,
+                goal: document.getElementById('smart_goal').value,
+                final: document.getElementById('final_plan').value
+            };
+            
+            if(!plan.issue || !plan.final) {
+                alert("아직 작성 중인 항목이 있습니다. 모든 단계를 신중히 검토해 주세요.");
+                return;
+            }
+
+            console.log("Saving Plan:", plan);
+            alert("전략이 확정되었습니다! 이 데이터를 바탕으로 새롭게 도약할 준비가 되었습니다.");
+        }
+    </script>
+</body>
+</html>
