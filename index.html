@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT PRO v3.0 | 마스터 플랜 대시보드</title>
+    <title>RE:BOOT PRO v3.1 | 마스터 플랜 대시보드</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -12,9 +12,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;800&display=swap');
         body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; color: #1e293b; }
         
-        /* 4열 배치를 위해 가로폭을 시원하게 확장 (PDF 출력 시 자동 축소됨) */
         .dashboard-container { max-width: 1400px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        
         .section-title { font-size: 1.1rem; font-weight: 800; color: #1e293b; margin-bottom: 12px; display: flex; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
         .section-title i { color: #3b82f6; margin-right: 8px; }
 
@@ -24,26 +22,28 @@
         .box-wrapper { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
         .box-title { background-color: #f1f5f9; color: #334155; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
         
-        textarea { width: 100%; border: none; padding: 12px; font-size: 0.85rem; line-height: 1.5; outline: none; resize: none; background: transparent; }
-        textarea::placeholder { color: #94a3b8; font-style: italic; }
+        textarea { width: 100%; border: none; padding: 12px; font-size: 0.85rem; line-height: 1.5; outline: none; resize: none; background: transparent; color: #1e293b; }
+        textarea::placeholder { color: #94a3b8; font-style: normal; font-size: 0.8rem; }
         
-        /* 월별 대시보드 인풋 스타일 */
         .month-box { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; flex: 1; min-width: 0; }
         .month-header { background: #3b82f6; color: white; text-align: center; font-weight: 800; font-size: 0.8rem; padding: 6px; border-radius: 7px 7px 0 0; }
         
-        /* 메모장 특화 스타일 */
         .memo-pad { background-color: #fef9c3; border: 1px solid #fde047; box-shadow: inset 0 0 10px rgba(250, 204, 21, 0.2); }
         .memo-pad textarea { height: calc(100% - 40px); background: repeating-linear-gradient(transparent, transparent 27px, #fef08a 28px); line-height: 28px; padding-top: 4px; color: #854d0e; font-weight: 600; }
         
         .history-card { border-left: 5px solid #3b82f6; page-break-inside: avoid; }
+        
+        /* 자동 요약 게시판 스타일 */
+        .auto-summary-list { height: 115px; overflow-y: auto; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .auto-summary-item { font-size: 0.85rem; padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
     </style>
 </head>
 <body class="py-8 px-4">
 
     <div class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end no-print">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v3.0</span></h1>
-            <p class="text-sm text-gray-500 mt-1 font-medium">거시적 요약부터 월별 실행까지, One-Page 전략 마스터플랜</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v3.1</span></h1>
+            <p class="text-sm text-gray-500 mt-1 font-medium">자동 요약 기능과 실무 가이드가 완벽히 적용된 버전입니다.</p>
         </div>
         <div class="flex gap-3 items-center">
             <select id="strategy-status" class="bg-white border border-gray-300 text-slate-700 h-[45px] px-4 rounded-lg font-bold outline-none">
@@ -65,21 +65,21 @@
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
             
             <div class="col-span-1 lg:col-span-1">
-                <div class="section-title"><i class="fas fa-star"></i> 전략 핵심 요약 (Summary)</div>
-                <div class="box-wrapper h-[115px] mb-0 border-blue-200 ring-2 ring-blue-50">
-                    <textarea id="summary" class="h-full font-bold text-blue-900 bg-blue-50/30" placeholder="결론적으로 이 전략이 무엇인지 한 줄로 요약하세요. (예: 기존 맘카페 채널을 활용한 1,000 매트 시장 선점 전략)"></textarea>
+                <div class="section-title"><i class="fas fa-list-check"></i> 전략 핵심 요약 (자동 생성)</div>
+                <div id="auto-summary-board" class="auto-summary-list">
+                    <div class="text-slate-400 text-sm text-center mt-8">전략을 저장하면 여기에 요약이 누적됩니다.</div>
                 </div>
             </div>
 
             <div class="col-span-1 lg:col-span-3">
                 <div class="section-title"><i class="fas fa-calendar-alt"></i> 월별 실행 대시보드 (Roadmap)</div>
                 <div class="flex gap-2">
-                    <div class="month-box"><div class="month-header">Month 1</div><textarea id="m1" class="h-[80px] p-2 text-[0.8rem]" placeholder="상세페이지 제작"></textarea></div>
-                    <div class="month-box"><div class="month-header">Month 2</div><textarea id="m2" class="h-[80px] p-2 text-[0.8rem]" placeholder="체험단 10명 배포"></textarea></div>
-                    <div class="month-box"><div class="month-header">Month 3</div><textarea id="m3" class="h-[80px] p-2 text-[0.8rem]" placeholder="SNS 광고 집행"></textarea></div>
-                    <div class="month-box"><div class="month-header">Month 4</div><textarea id="m4" class="h-[80px] p-2 text-[0.8rem]" placeholder="오프라인 부스 참가"></textarea></div>
-                    <div class="month-box"><div class="month-header">Month 5</div><textarea id="m5" class="h-[80px] p-2 text-[0.8rem]" placeholder="B2B 판로 개척"></textarea></div>
-                    <div class="month-box"><div class="month-header">Month 6</div><textarea id="m6" class="h-[80px] p-2 text-[0.8rem]" placeholder="매출 50억 달성 점검"></textarea></div>
+                    <div class="month-box"><div class="month-header">Month 1</div><textarea id="m1" class="h-[80px] p-2 text-[0.8rem]" placeholder="예: 상세페이지 기획 완료"></textarea></div>
+                    <div class="month-box"><div class="month-header">Month 2</div><textarea id="m2" class="h-[80px] p-2 text-[0.8rem]" placeholder="예: 맘카페 체험단 10명"></textarea></div>
+                    <div class="month-box"><div class="month-header">Month 3</div><textarea id="m3" class="h-[80px] p-2 text-[0.8rem]" placeholder="예: SNS 타겟 광고 시작"></textarea></div>
+                    <div class="month-box"><div class="month-header">Month 4</div><textarea id="m4" class="h-[80px] p-2 text-[0.8rem]" placeholder="예: 베이비페어 오프라인 참가"></textarea></div>
+                    <div class="month-box"><div class="month-header">Month 5</div><textarea id="m5" class="h-[80px] p-2 text-[0.8rem]" placeholder="예: B2B 유통망 컨택"></textarea></div>
+                    <div class="month-box"><div class="month-header">Month 6</div><textarea id="m6" class="h-[80px] p-2 text-[0.8rem]" placeholder="예: 매출 50억 달성 리뷰"></textarea></div>
                 </div>
             </div>
         </div>
@@ -88,22 +88,22 @@
             
             <div class="step-col">
                 <div class="step-header bg-slate-700">STEP 01. 문제 인식</div>
-                <div class="box-wrapper"><div class="box-title">현황 (전략 제목)</div><textarea id="p1_1" class="h-[80px]"></textarea></div>
-                <div class="box-wrapper"><div class="box-title">원인 규명</div><textarea id="p1_2" class="h-[80px]"></textarea></div>
-                <div class="box-wrapper mb-0"><div class="box-title">핵심 과제 도출</div><textarea id="p1_3" class="h-[80px]"></textarea></div>
+                <div class="box-wrapper"><div class="box-title">현황 (전략 제목)</div><textarea id="p1_1" class="h-[80px]" placeholder="예: 매출 저하로 인한 회사운영 위기"></textarea></div>
+                <div class="box-wrapper"><div class="box-title">원인 규명</div><textarea id="p1_2" class="h-[80px]" placeholder="예: 큰 매트로 시장 변화"></textarea></div>
+                <div class="box-wrapper mb-0"><div class="box-title">핵심 과제 도출</div><textarea id="p1_3" class="h-[80px]" placeholder="예: 우리도 1,000 매트 출시"></textarea></div>
             </div>
             
             <div class="step-col">
                 <div class="step-header bg-blue-700">STEP 02. 방안 탐색</div>
-                <div class="box-wrapper"><div class="box-title">해결 목표 수립</div><textarea id="p2_1" class="h-[80px]"></textarea></div>
-                <div class="box-wrapper"><div class="box-title">해결 방안 탐색</div><textarea id="p2_2" class="h-[80px]"></textarea></div>
-                <div class="box-wrapper mb-0"><div class="box-title">대안별 평가</div><textarea id="p2_3" class="h-[80px]"></textarea></div>
+                <div class="box-wrapper"><div class="box-title">해결 목표 수립</div><textarea id="p2_1" class="h-[80px]" placeholder="예: 월 매출 50억 달성"></textarea></div>
+                <div class="box-wrapper"><div class="box-title">해결 방안 탐색</div><textarea id="p2_2" class="h-[80px]" placeholder="예: SNS 협찬 및 박람회, 인터넷 판매"></textarea></div>
+                <div class="box-wrapper mb-0"><div class="box-title">대안별 평가</div><textarea id="p2_3" class="h-[80px]" placeholder="예: 박람회는 비용이 높으나 즉각적임"></textarea></div>
             </div>
             
             <div class="step-col">
                 <div class="step-header bg-indigo-700">STEP 03. 선정 및 실행</div>
-                <div class="box-wrapper"><div class="box-title">최적안 선정</div><textarea id="p3_1" class="h-[80px]"></textarea></div>
-                <div class="box-wrapper mb-4"><div class="box-title">세부 실행 계획</div><textarea id="p3_2" class="h-[80px]"></textarea></div>
+                <div class="box-wrapper"><div class="box-title">최적안 선정</div><textarea id="p3_1" class="h-[80px]" placeholder="예: 인터넷 판매 메인, SNS 협찬 병행"></textarea></div>
+                <div class="box-wrapper mb-4"><div class="box-title">세부 실행 계획</div><textarea id="p3_2" class="h-[80px]" placeholder="예: 1주차 상세페이지, 2주차 체험단"></textarea></div>
                 <div class="bg-indigo-900 text-white rounded-lg h-[92px] flex items-center justify-center font-black text-lg tracking-widest shadow-inner border border-indigo-950">
                     EXECUTION
                 </div>
@@ -114,24 +114,23 @@
                 <div class="text-[0.95rem] font-bold text-yellow-800 mb-2 border-b border-yellow-300 pb-2 flex items-center">
                     <i class="fas fa-thumbtack mr-2"></i> 아이디어 메모장
                 </div>
-                <textarea id="memo" placeholder="불현듯 떠오른 아이디어, 경쟁사 벤치마킹 링크, 유의사항 등을 자유롭게 적어두세요!"></textarea>
+                <textarea id="memo" placeholder="불현듯 떠오른 아이디어, 경쟁사 벤치마킹 링크 등을 자유롭게 적어두세요!"></textarea>
             </div>
             
         </div>
     </div>
 
-    <div class="max-w-[1400px] mx-auto">
+    <div class="max-w-[1400px] mx-auto pb-20">
         <h2 class="text-xl font-extrabold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-layer-group text-blue-600 mr-3"></i> 확정된 전략 아카이브
+            <i class="fas fa-layer-group text-blue-600 mr-3"></i> 확정된 전략 전체 아카이브
             <span id="history-count" class="ml-3 bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">0건</span>
         </h2>
         <div id="history-container" class="space-y-4"></div>
     </div>
 
     <script>
-        // 관리할 모든 입력 필드 목록
-        const fields = ['summary', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6', 'p1_1', 'p1_2', 'p1_3', 'p2_1', 'p2_2', 'p2_3', 'p3_1', 'p3_2', 'memo'];
-        const labels = ['요약', 'M1', 'M2', 'M3', 'M4', 'M5', 'M6', '현황', '원인', '과제', '목표', '대안', '평가', '결정', '계획', '메모'];
+        const fields = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'p1_1', 'p1_2', 'p1_3', 'p2_1', 'p2_2', 'p2_3', 'p3_1', 'p3_2', 'memo'];
+        const labels = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', '현황', '원인', '과제', '목표', '대안', '평가', '결정', '계획', '메모'];
 
         window.onload = () => renderHistory();
 
@@ -151,9 +150,9 @@
 
             if(!hasContent) return alert("저장할 내용을 하나라도 입력해주세요.");
 
-            let history = JSON.parse(localStorage.getItem('pro_v3_history') || "[]");
+            let history = JSON.parse(localStorage.getItem('pro_v3_1_history') || "[]");
             history.unshift(currentStrategy);
-            localStorage.setItem('pro_v3_history', JSON.stringify(history));
+            localStorage.setItem('pro_v3_1_history', JSON.stringify(history));
 
             fields.forEach(id => document.getElementById(id).value = "");
             renderHistory();
@@ -161,26 +160,41 @@
 
         function renderHistory() {
             const container = document.getElementById('history-container');
-            const history = JSON.parse(localStorage.getItem('pro_v3_history') || "[]");
+            const summaryBoard = document.getElementById('auto-summary-board');
+            const history = JSON.parse(localStorage.getItem('pro_v3_1_history') || "[]");
+            
             document.getElementById('history-count').innerText = `${history.length}건`;
 
             if(history.length === 0) {
                 container.innerHTML = `<div class="text-center py-8 bg-white rounded-xl shadow-sm text-gray-400">저장된 전략이 없습니다.</div>`;
+                summaryBoard.innerHTML = `<div class="text-slate-400 text-sm text-center mt-8">전략을 저장하면 여기에 요약이 누적됩니다.</div>`;
                 return;
             }
 
             container.innerHTML = "";
+            summaryBoard.innerHTML = ""; // 상단 요약 게시판 초기화
+
             history.forEach((item, index) => {
-                // 현황(p1_1)을 제목으로 사용. 없으면 기본 제목
-                const title = item.details["현황"] || item.details["요약"] || `새로운 도약 전략 #${history.length - index}`;
+                const title = item.details["현황"] || `새로운 도약 전략 #${history.length - index}`;
+                const coreTask = item.details["과제"] || "-";
+                const bestPlan = item.details["결정"] || "-";
                 
-                // 상태 태그 색상
                 let statusColor = "bg-gray-100 text-gray-600";
                 if(item.status.includes("검토")) statusColor = "bg-orange-100 text-orange-700";
                 if(item.status.includes("확정")) statusColor = "bg-green-100 text-green-700";
 
-                // 핵심 내용만 간략히 표시되도록 조절 (월별, 메모 등은 불러오기를 통해 확인)
-                const previewLabels = ['요약', '원인', '과제', '결정']; 
+                // 1. 상단 '전략 핵심 요약' 게시판에 리스트 추가 (자동 생성)
+                summaryBoard.innerHTML += `
+                    <div class="auto-summary-item">
+                        <span class="${statusColor} text-[10px] font-bold px-2 py-0.5 rounded mr-2 whitespace-nowrap">${item.status}</span>
+                        <div class="truncate text-slate-700 font-medium">
+                            <b>[${title}]</b> ➔ ${coreTask} ➔ ${bestPlan}
+                        </div>
+                    </div>
+                `;
+
+                // 2. 하단 '전체 아카이브' 카드 생성 (이전과 동일)
+                const previewLabels = ['원인', '과제', '목표', '결정']; 
                 const detailsHtml = previewLabels.map(key => {
                     if(item.details[key]) {
                         return `<div class="bg-gray-50 p-2 rounded border border-gray-100"><div class="text-[10px] font-bold text-blue-600 mb-1">${key}</div><div class="text-xs text-gray-700 truncate">${item.details[key]}</div></div>`;
@@ -196,7 +210,7 @@
                                 <h3 class="text-md font-extrabold text-gray-900">${title}</h3>
                             </div>
                             <div class="flex gap-2 no-print">
-                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded font-bold transition">불러오기</button>
+                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded font-bold transition">수정/불러오기</button>
                                 <button onclick="exportSingleCard(${item.id})" class="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1.5 rounded font-bold transition">PDF 다운</button>
                                 <button onclick="deleteStrategy(${item.id})" class="text-xs text-red-400 hover:text-red-600 p-1.5"><i class="fas fa-trash"></i></button>
                             </div>
@@ -208,7 +222,7 @@
         }
 
         function loadStrategy(id) {
-            const history = JSON.parse(localStorage.getItem('pro_v3_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v3_1_history') || "[]");
             const item = history.find(h => h.id === id);
             if(item) {
                 fields.forEach((fieldId, idx) => {
@@ -216,15 +230,15 @@
                 });
                 document.getElementById('strategy-status').value = item.status || "초안 작성중";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                alert("불러오기 완료! 상단 캔버스에서 수정 후 다시 저장하세요.");
+                alert("불러오기 완료! 상단 캔버스에서 수정 후 다시 [전체 저장]을 눌러주세요.");
             }
         }
 
         function deleteStrategy(id) {
             if(confirm("이 전략을 영구 삭제하시겠습니까?")) {
-                let history = JSON.parse(localStorage.getItem('pro_v3_history') || "[]");
+                let history = JSON.parse(localStorage.getItem('pro_v3_1_history') || "[]");
                 history = history.filter(h => h.id !== id);
-                localStorage.setItem('pro_v3_history', JSON.stringify(history));
+                localStorage.setItem('pro_v3_1_history', JSON.stringify(history));
                 renderHistory();
             }
         }
