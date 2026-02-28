@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT PRO v4.3 | 8주 마스터플랜</title>
+    <title>RE:BOOT PRO v4.4 | 데이터 유지 완결판</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -29,7 +29,6 @@
         .memo-pad textarea { height: calc(100% - 40px); background: repeating-linear-gradient(transparent, transparent 27px, #fef08a 28px); line-height: 28px; padding-top: 4px; color: #854d0e; font-weight: 600; }
         
         .history-card { border-left: 5px solid #3b82f6; page-break-inside: avoid; }
-        
         .auto-summary-list { height: 160px; overflow-y: auto; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
         .auto-summary-item { font-size: 0.85rem; padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         
@@ -43,10 +42,13 @@
 
     <div class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end no-print">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v4.3</span></h1>
-            <p class="text-sm text-gray-500 mt-1 font-bold">8주 스프린트 마스터플랜 (데이터 연동 및 UI 최적화)</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v4.4</span></h1>
+            <p class="text-sm text-gray-500 mt-1 font-bold">저장 시 데이터 유지 및 덮어쓰기 완벽 지원</p>
         </div>
         <div class="flex gap-3 items-center">
+            <button onclick="startNewStrategy()" class="bg-white border border-gray-300 hover:bg-gray-50 text-slate-700 px-5 py-2.5 rounded-lg font-bold shadow-sm transition-all">
+                <i class="fas fa-sync-alt mr-2"></i> 새 전략 작성 (비우기)
+            </button>
             <select id="strategy-status" class="bg-white border border-gray-300 text-slate-700 h-[45px] px-4 rounded-lg font-bold outline-none cursor-pointer shadow-sm">
                 <option value="초안 작성중">📝 초안 작성중</option>
                 <option value="검토 필요">🔍 검토 필요</option>
@@ -152,19 +154,32 @@
         <div id="history-container" class="space-y-4"></div>
     </div>
 
+    <div id="toast" class="fixed bottom-[-100px] left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-xl z-50 font-bold transition-all duration-300 opacity-0"></div>
+
     <script>
         const fields = ['p1_1', 'p1_2', 'p1_3', 'p2_1', 'p2_2', 'p2_3', 'p3_1', 'p3_2', 'memo'];
         const labels = ['현황', '원인', '과제', '목표', '대안', '평가', '결정', '계획', '메모'];
 
         let currentGanttTasks = [];
+        let currentEditingId = null; // 🌟 현재 덮어쓰기할 전략의 ID 추적
+
         const chartColors = ['bg-blue-500', 'bg-indigo-500', 'bg-emerald-500', 'bg-purple-500', 'bg-cyan-600'];
 
-        // 🌟 [핵심 기능] 요약 데이터(현재 작성중인 제목 + 저장된 리스트)를 간트 차트 선택지에 연결
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.replace('bottom-[-100px]', 'bottom-10');
+            toast.classList.replace('opacity-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.replace('bottom-10', 'bottom-[-100px]');
+                toast.classList.replace('opacity-100', 'opacity-0');
+            }, 3000);
+        }
+
         function updateGanttSuggestions() {
             const datalist = document.getElementById('strategy-suggestions');
             datalist.innerHTML = ''; 
 
-            // 1. 현재 캔버스에 적고 있는 '현황(제목)' 추가
             const currentTitle = document.getElementById('p1_1').value.trim();
             if(currentTitle) {
                 const opt = document.createElement('option');
@@ -172,25 +187,35 @@
                 datalist.appendChild(opt);
             }
 
-            // 2. 저장된 히스토리(전략 핵심 요약) 목록 추가
-            const history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
             history.forEach(item => {
                 const title = item.details["현황"] || "무제 전략";
                 const task = item.details["과제"] || "";
                 const opt = document.createElement('option');
-                // 요약 게시판에 뜨는 흐름 그대로 선택지에 제공
                 opt.value = `${title} ➔ ${task}`;
                 datalist.appendChild(opt);
             });
         }
 
-        // 현황(제목)을 입력할 때마다 선택지 업데이트
         document.getElementById('p1_1').addEventListener('input', updateGanttSuggestions);
 
         window.onload = () => {
             renderHistory();
-            updateGanttSuggestions(); // 초기 선택지 세팅
+            updateGanttSuggestions(); 
         };
+
+        // 🌟 새 캔버스 열기 기능
+        function startNewStrategy() {
+            if(confirm("화면을 비우고 새 전략을 작성하시겠습니까? (저장하지 않은 내용은 사라집니다)")) {
+                currentEditingId = null; // 신규 작성 모드로 전환
+                fields.forEach(id => document.getElementById(id).value = "");
+                currentGanttTasks = [];
+                document.getElementById('strategy-status').value = "초안 작성중";
+                drawGantt();
+                updateGanttSuggestions();
+                showToast("새 캔버스가 준비되었습니다.");
+            }
+        }
 
         function addGanttTask() {
             const name = document.getElementById('g-name').value.trim();
@@ -201,10 +226,8 @@
             if(start > end) return alert("시작 주차가 종료 주차보다 늦을 수 없습니다!");
 
             currentGanttTasks.push({ id: Date.now(), name, start, end });
-            
             document.getElementById('g-name').value = '';
             document.getElementById('g-start').value = end; 
-            
             drawGantt();
         }
 
@@ -241,37 +264,54 @@
             });
         }
 
+        // 🌟 저장 로직 전면 개편 (덮어쓰기 지원 및 화면 유지)
         function saveToHistory() {
             let hasContent = false;
-            let currentStrategy = { 
-                id: Date.now(), date: new Date().toLocaleString('ko-KR'), status: document.getElementById('strategy-status').value,
-                details: {}, gantt: [...currentGanttTasks] 
-            };
+            let newDetails = {};
 
             fields.forEach((id, idx) => {
                 const val = document.getElementById(id).value.trim();
-                if(val) { currentStrategy.details[labels[idx]] = val; hasContent = true; }
+                if(val) { newDetails[labels[idx]] = val; hasContent = true; }
             });
 
             if(!hasContent && currentGanttTasks.length === 0) return alert("저장할 내용을 하나라도 입력해주세요.");
 
-            let history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
-            history.unshift(currentStrategy);
-            localStorage.setItem('pro_v4_3_history', JSON.stringify(history));
+            let history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
 
-            fields.forEach(id => document.getElementById(id).value = "");
-            currentGanttTasks = [];
-            drawGantt();
+            if(currentEditingId) {
+                // 수정(덮어쓰기) 모드
+                const itemIndex = history.findIndex(h => h.id === currentEditingId);
+                if(itemIndex > -1) {
+                    history[itemIndex].details = newDetails;
+                    history[itemIndex].gantt = [...currentGanttTasks];
+                    history[itemIndex].status = document.getElementById('strategy-status').value;
+                    history[itemIndex].date = new Date().toLocaleString('ko-KR') + " (수정됨)";
+                    showToast("기존 전략이 성공적으로 업데이트(덮어쓰기) 되었습니다!");
+                }
+            } else {
+                // 신규 저장 모드
+                currentEditingId = Date.now(); // 방금 저장한 것을 덮어쓰기 모드로 즉시 전환
+                history.unshift({ 
+                    id: currentEditingId, 
+                    date: new Date().toLocaleString('ko-KR'), 
+                    status: document.getElementById('strategy-status').value,
+                    details: newDetails, 
+                    gantt: [...currentGanttTasks] 
+                });
+                showToast("새로운 전략이 저장되었습니다! (계속 수정 가능합니다)");
+            }
+
+            localStorage.setItem('pro_v4_4_history', JSON.stringify(history));
+
+            // 🌟 주의: 여기서 캔버스를 초기화하지 않음 (데이터 유지!)
             renderHistory();
-            updateGanttSuggestions(); // 새 전략이 추가되었으므로 선택지 갱신
-            
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            updateGanttSuggestions(); 
         }
 
         function renderHistory() {
             const container = document.getElementById('history-container');
             const summaryBoard = document.getElementById('auto-summary-board');
-            const history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
             
             document.getElementById('history-count').innerText = `${history.length}건`;
 
@@ -286,7 +326,6 @@
             history.forEach((item, index) => {
                 const title = item.details["현황"] || `새로운 도약 전략 #${history.length - index}`;
                 const coreTask = item.details["과제"] || "-";
-                const bestPlan = item.details["결정"] || "-";
                 const taskCount = item.gantt ? item.gantt.length : 0;
                 
                 let statusColor = "bg-gray-100 text-gray-600";
@@ -320,7 +359,7 @@
                                 <h3 class="text-md font-extrabold text-gray-900">${title}</h3>
                             </div>
                             <div class="flex gap-2 no-print">
-                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded font-bold transition">불러오기</button>
+                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded font-bold transition">불러오기(수정)</button>
                                 <button onclick="exportSingleCard(${item.id})" class="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1.5 rounded font-bold transition">PDF 다운</button>
                                 <button onclick="deleteStrategy(${item.id})" class="text-xs text-red-400 hover:text-red-600 p-1.5"><i class="fas fa-trash"></i></button>
                             </div>
@@ -331,25 +370,31 @@
             });
         }
 
+        // 🌟 전략 불러올 때 수정 모드로 전환되도록 세팅
         function loadStrategy(id) {
-            const history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
             const item = history.find(h => h.id === id);
             if(item) {
+                currentEditingId = id; // 이 ID를 기억해뒀다가 덮어쓰기!
                 fields.forEach((fieldId, idx) => { document.getElementById(fieldId).value = item.details[labels[idx]] || ""; });
                 document.getElementById('strategy-status').value = item.status || "초안 작성중";
                 currentGanttTasks = item.gantt ? [...item.gantt] : [];
                 drawGantt();
                 updateGanttSuggestions();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                alert("불러오기 완료! 상단 캔버스에서 수정 후 다시 [전략 전체 저장]을 눌러주세요.");
+                showToast("불러오기 완료! 내용을 수정하고 저장하면 덮어쓰기 됩니다.");
             }
         }
 
         function deleteStrategy(id) {
             if(confirm("이 전략을 영구 삭제하시겠습니까?")) {
-                let history = JSON.parse(localStorage.getItem('pro_v4_3_history') || "[]");
+                let history = JSON.parse(localStorage.getItem('pro_v4_4_history') || "[]");
                 history = history.filter(h => h.id !== id);
-                localStorage.setItem('pro_v4_3_history', JSON.stringify(history));
+                localStorage.setItem('pro_v4_4_history', JSON.stringify(history));
+                
+                // 만약 삭제한 걸 현재 캔버스에서 수정 중이었다면 신규 모드로 변경
+                if(currentEditingId === id) currentEditingId = null; 
+                
                 renderHistory();
                 updateGanttSuggestions();
             }
