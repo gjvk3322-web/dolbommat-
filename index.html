@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RE:BOOT PRO v6.1 | PDF 버그 완벽 해결판</title>
+    <title>RE:BOOT PRO v7.0 | AI 컨설팅 연동 대시보드</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -25,6 +25,15 @@
         textarea { width: 100%; border: none; padding: 12px; font-size: 0.85rem; line-height: 1.5; outline: none; resize: none; background: transparent; }
         textarea::placeholder { color: #94a3b8; font-style: normal; }
         
+        /* 🌟 인쇄(PDF) 시 textarea를 일반 텍스트 박스로 보이게 처리 */
+        @media print {
+            textarea { display: block; height: auto !important; overflow: visible; white-space: pre-wrap; word-wrap: break-word; background: white; border: none; }
+            .box-wrapper { page-break-inside: avoid; margin-bottom: 10px; border: 1px solid #cbd5e1; }
+            .no-print { display: none !important; }
+            .dashboard-container { box-shadow: none; border: none; padding: 0; }
+            body { background-color: white; }
+        }
+
         .memo-pad { background-color: #fef9c3; border: 1px solid #fde047; box-shadow: inset 0 0 10px rgba(250, 204, 21, 0.2); }
         .memo-pad textarea { height: 100px; background: repeating-linear-gradient(transparent, transparent 27px, #fef08a 28px); line-height: 28px; padding-top: 4px; color: #854d0e; font-weight: 600; }
         
@@ -33,7 +42,7 @@
         .auto-summary-list { height: 230px; overflow-y: auto; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
         .auto-summary-item { font-size: 0.85rem; padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         
-        .gantt-grid { display: grid; grid-template-columns: 200px 1fr; gap: 10px; align-items: center; margin-bottom: 6px; }
+        .gantt-grid { display: grid; grid-template-columns: 200px 1fr; gap: 10px; align-items: center; margin-bottom: 6px; page-break-inside: avoid; }
         .gantt-track { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; background: #f1f5f9; border-radius: 6px; height: 32px; position: relative; border: 1px solid #e2e8f0; }
         .gantt-bar { border-radius: 4px; display: flex; align-items: center; padding: 0 10px; color: white; font-weight: 800; font-size: 0.75rem; white-space: nowrap; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .gantt-input { border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 0.85rem; outline: none; }
@@ -43,23 +52,26 @@
 
     <div class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end no-print">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-blue-600">PRO v6.1</span></h1>
-            <p class="text-sm text-gray-500 mt-1 font-bold">PDF 글자 잘림 및 하얀 화면 버그가 완벽하게 수정된 버전입니다.</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">RE:BOOT <span class="text-indigo-600">PRO v7.0</span></h1>
+            <p class="text-sm text-gray-500 mt-1 font-bold">AI 제미나이 협업용 텍스트 추출 완벽 지원 대시보드</p>
         </div>
         <div class="flex gap-3 items-center">
+            <button onclick="copyCurrentToAI()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center">
+                <i class="fas fa-robot text-xl mr-2 text-indigo-200"></i>
+                현재 화면 AI에게 전달하기 (복사)
+            </button>
             <select id="strategy-status" class="bg-white border border-gray-300 text-slate-700 h-[45px] px-4 rounded-lg font-bold outline-none cursor-pointer shadow-sm">
                 <option value="초안 작성중">📝 초안 작성중</option>
                 <option value="검토 필요">🔍 검토 필요</option>
                 <option value="실행 확정">🚀 실행 확정</option>
             </select>
-            <button onclick="exportFullPDF()" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition-all">
-                <i class="fas fa-file-pdf mr-2"></i> 대시보드 전체 PDF 출력
+            <button onclick="exportFullPDF()" class="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition-all">
+                <i class="fas fa-file-pdf mr-2"></i> PDF 출력
             </button>
         </div>
     </div>
 
     <div id="print-master-area">
-        
         <div class="dashboard-container mb-10" id="canvas-area">
             
             <div class="mb-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -71,25 +83,25 @@
                 </div>
 
                 <div class="col-span-1 lg:col-span-3 flex flex-col">
-                    <div class="section-title"><i class="fas fa-stopwatch text-blue-600"></i> 8주 스프린트 로드맵 (Gantt Chart)</div>
+                    <div class="section-title"><i class="fas fa-stopwatch text-indigo-600"></i> 8주 스프린트 로드맵 (Gantt Chart)</div>
                     
                     <div class="bg-white border border-slate-300 rounded-lg p-4 flex-1 shadow-sm flex flex-col">
-                        <div class="flex gap-2 mb-4 no-print bg-blue-50 p-2 rounded-lg border border-blue-200">
-                            <input type="text" id="g-name" list="strategy-suggestions" class="gantt-input flex-1 focus:border-blue-500 font-bold text-blue-900" placeholder="▼ 클릭하여 왼쪽의 [전략 핵심 요약] 내용을 선택하세요">
+                        <div class="flex gap-2 mb-4 no-print bg-indigo-50 p-2 rounded-lg border border-indigo-200">
+                            <input type="text" id="g-name" list="strategy-suggestions" class="gantt-input flex-1 focus:border-indigo-500 font-bold text-indigo-900" placeholder="▼ 클릭하여 왼쪽의 [전략 핵심 요약] 내용을 선택하세요">
                             <datalist id="strategy-suggestions"></datalist>
 
-                            <div class="flex items-center text-sm font-bold text-blue-800 px-2">시작:</div>
-                            <select id="g-start" class="gantt-input bg-white cursor-pointer font-bold text-blue-700">
+                            <div class="flex items-center text-sm font-bold text-indigo-800 px-2">시작:</div>
+                            <select id="g-start" class="gantt-input bg-white cursor-pointer font-bold text-indigo-700">
                                 <option value="1">1주차</option><option value="2">2주차</option><option value="3">3주차</option><option value="4">4주차</option>
                                 <option value="5">5주차</option><option value="6">6주차</option><option value="7">7주차</option><option value="8">8주차</option>
                             </select>
-                            <div class="flex items-center text-sm font-bold text-blue-800 px-2">종료:</div>
-                            <select id="g-end" class="gantt-input bg-white cursor-pointer font-bold text-blue-700">
+                            <div class="flex items-center text-sm font-bold text-indigo-800 px-2">종료:</div>
+                            <select id="g-end" class="gantt-input bg-white cursor-pointer font-bold text-indigo-700">
                                 <option value="1">1주차</option><option value="2">2주차</option><option value="3">3주차</option><option value="4">4주차</option>
                                 <option value="5">5주차</option><option value="6">6주차</option><option value="7">7주차</option><option value="8">8주차</option>
                             </select>
-                            <button onclick="addGanttTask()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-lg font-bold transition-colors">
-                                <i class="fas fa-plus mr-1"></i> 전략 등록
+                            <button onclick="addGanttTask()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 rounded-lg font-bold transition-colors">
+                                <i class="fas fa-plus mr-1"></i> 일정 등록
                             </button>
                         </div>
 
@@ -97,11 +109,11 @@
                             <div class="grid grid-cols-[200px_1fr] gap-10 bg-slate-100 border-b border-slate-200 p-2 pr-4">
                                 <div class="text-xs font-bold text-slate-500 text-center flex items-center justify-center">핵심 전략 요약 (Task)</div>
                                 <div class="grid grid-cols-8 text-center text-[0.75rem] font-extrabold text-slate-600">
-                                    <div>W1</div><div>W2</div><div>W3</div><div>W4</div><div class="text-blue-500">W5</div><div class="text-blue-500">W6</div><div class="text-blue-500">W7</div><div class="text-blue-500">W8</div>
+                                    <div>W1</div><div>W2</div><div>W3</div><div>W4</div><div class="text-indigo-500">W5</div><div class="text-indigo-500">W6</div><div class="text-indigo-500">W7</div><div class="text-indigo-500">W8</div>
                                 </div>
                             </div>
                             <div id="gantt-canvas" class="p-3 min-h-[100px]">
-                                <div class="text-slate-400 text-center text-xs mt-6">상단의 [전략 등록] 버튼을 눌러 8주 일정을 채워보세요.</div>
+                                <div class="text-slate-400 text-center text-xs mt-6">상단의 [일정 등록] 버튼을 눌러 8주 일정을 채워보세요.</div>
                             </div>
                         </div>
                     </div>
@@ -129,9 +141,9 @@
                     <div class="box-wrapper"><div class="box-title">최적안 선정</div><textarea id="p3_1" class="h-[80px]" placeholder="예: 인터넷 판매 메인, SNS 협찬 병행"></textarea></div>
                     <div class="box-wrapper mb-4"><div class="box-title">세부 실행 계획 (Enter로 줄바꿈)</div><textarea id="p3_2" class="h-[80px]" placeholder="1. 상세페이지 제작&#10;2. 맘카페 체험단 모집&#10;3. SNS 타겟광고 세팅"></textarea></div>
                     
-                    <button onclick="saveToHistory()" class="mt-auto w-full bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-extrabold text-[1.05rem] shadow-xl border border-slate-900 transition-all duration-300 print:hidden">
-                        <i class="fas fa-plus-circle mr-2 text-xl text-blue-400"></i> 
-                        <span>새로운 전략으로 저장</span>
+                    <button onclick="saveToHistory()" class="mt-auto w-full bg-slate-800 hover:bg-slate-900 text-white rounded-lg h-[92px] flex items-center justify-center font-extrabold text-[1.05rem] shadow-xl border border-slate-900 transition-all duration-300 print:hidden leading-snug px-2 text-center">
+                        <i class="fas fa-layer-group mr-2 text-xl text-indigo-400"></i> 
+                        <span>전략 저장 후<br>새 캔버스 열기</span>
                     </button>
                     <div class="hidden print:flex bg-slate-100 text-slate-800 rounded-lg h-[92px] items-center justify-center font-black text-lg tracking-widest shadow-inner border border-slate-300 w-full mt-auto">
                         RE:BOOT SPRINT PLAN
@@ -143,7 +155,7 @@
                         <div class="text-[0.95rem] font-extrabold text-purple-800 mb-2 border-b border-purple-200 pb-2 flex items-center">
                             <i class="fas fa-gem mr-2 text-purple-500"></i> 원하는 결과 (Outcome)
                         </div>
-                        <textarea id="p_result" class="flex-1 bg-transparent border-none outline-none resize-none text-purple-900 font-semibold placeholder-purple-300 text-[0.85rem]" placeholder="이 8주 전략을 모두 끝마쳤을 때, 우리 회사에 일어났으면 하는 구체적인 변화나 성과를 적어보세요."></textarea>
+                        <textarea id="p_result" class="flex-1 bg-transparent border-none outline-none resize-none text-purple-900 font-semibold placeholder-purple-400 text-[0.85rem]" placeholder="이 전략이 성공하면 회사에 어떤 결과가 나오나요?"></textarea>
                     </div>
 
                     <div class="memo-pad relative overflow-hidden rounded-xl p-4 shadow-sm flex flex-col h-1/2 border border-yellow-300">
@@ -151,7 +163,7 @@
                         <div class="text-[0.9rem] font-extrabold text-yellow-800 mb-2 border-b border-yellow-300 pb-2 flex items-center">
                             <i class="fas fa-thumbtack mr-2"></i> 아이디어 메모장
                         </div>
-                        <textarea id="memo" class="flex-1 bg-transparent border-none outline-none resize-none text-[0.85rem]" placeholder="갑자기 떠오른 아이디어를 가볍게 적어두세요."></textarea>
+                        <textarea id="memo" class="flex-1 bg-transparent border-none outline-none resize-none text-[0.85rem]" placeholder="자유롭게 적어주세요."></textarea>
                     </div>
                 </div>
             </div>
@@ -159,36 +171,23 @@
 
         <div class="max-w-[1400px] mx-auto pb-20">
             <h2 class="text-xl font-extrabold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-layer-group text-blue-600 mr-3"></i> 8주 스프린트 전략 아카이브
-                <span id="history-count" class="ml-3 bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">0건</span>
+                <i class="fas fa-layer-group text-indigo-600 mr-3"></i> 8주 스프린트 전략 아카이브
+                <span id="history-count" class="ml-3 bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">0건</span>
             </h2>
             <div id="history-container" class="space-y-4"></div>
         </div>
-
-    </div> <div id="toast" class="fixed bottom-[-100px] left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-xl z-50 font-bold transition-all duration-300 opacity-0"></div>
+    </div> <div id="toast" class="fixed bottom-[-100px] left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-8 py-4 rounded-full shadow-2xl z-50 font-bold transition-all duration-300 opacity-0 text-center flex items-center gap-3 border-4 border-indigo-400"></div>
 
     <script>
         const fields = ['p1_1', 'p1_2', 'p1_3', 'p2_1', 'p2_2', 'p2_3', 'p3_1', 'p3_2', 'p_result', 'memo'];
-        const labels = ['현황', '원인', '과제', '목표', '대안', '평가', '결정', '계획', '결과', '메모'];
+        const labels = ['현황(제목)', '원인 규명', '핵심 과제', '해결 목표', '방안 탐색', '대안 평가', '최적안 결정', '실행 계획', '원하는 결과', '메모'];
 
         let currentGanttTasks = [];
-        const chartColors = ['bg-blue-500', 'bg-indigo-500', 'bg-emerald-500', 'bg-purple-500', 'bg-cyan-600'];
-
-        function saveDraft() {
-            const draft = {
-                gantt: currentGanttTasks,
-                status: document.getElementById('strategy-status').value,
-                fields: {}
-            };
-            fields.forEach(id => {
-                draft.fields[id] = document.getElementById(id).value;
-            });
-            localStorage.setItem('pro_v6_1_draft', JSON.stringify(draft));
-        }
+        const chartColors = ['bg-indigo-500', 'bg-blue-500', 'bg-emerald-500', 'bg-purple-500', 'bg-cyan-600'];
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            toast.innerText = msg;
+            toast.innerHTML = `<i class="fas fa-check-circle text-2xl"></i> ${msg}`;
             toast.classList.replace('bottom-[-100px]', 'bottom-10');
             toast.classList.replace('opacity-0', 'opacity-100');
             setTimeout(() => {
@@ -197,19 +196,133 @@
             }, 3000);
         }
 
+        // 🌟 1. AI 컨설팅을 위한 텍스트 추출 및 복사 함수 (핵심 기능)
+        function formatDataForAI(details, gantt) {
+            let promptText = `안녕 제미나이! 우리 회사의 새로운 사업 전략을 기획했어. 아래 내용을 읽고 컨설턴트 입장에서 피드백해 줘.\n\n`;
+            promptText += `=====================================\n`;
+            promptText += `[기획안: ${details['현황(제목)'] || '무제'}]\n\n`;
+            
+            promptText += `💡 1단계. 문제 인식\n`;
+            promptText += `- 현황/문제: ${details['현황(제목)'] || '-'}\n`;
+            promptText += `- 원인 분석: ${details['원인 규명'] || '-'}\n`;
+            promptText += `- 핵심 과제: ${details['핵심 과제'] || '-'}\n\n`;
+            
+            promptText += `🎯 2단계. 방안 탐색\n`;
+            promptText += `- 해결 목표: ${details['해결 목표'] || '-'}\n`;
+            promptText += `- 대안 탐색: ${details['방안 탐색'] || '-'}\n`;
+            promptText += `- 대안 평가: ${details['대안 평가'] || '-'}\n\n`;
+            
+            promptText += `🚀 3단계. 선정 및 실행\n`;
+            promptText += `- 최적안 선정: ${details['최적안 결정'] || '-'}\n`;
+            promptText += `- 실행 계획:\n${details['실행 계획'] || '-'}\n\n`;
+            
+            promptText += `💎 4단계. 기대 효과\n`;
+            promptText += `- 원하는 결과(Outcome): ${details['원하는 결과'] || '-'}\n\n`;
+            
+            if(gantt && gantt.length > 0) {
+                promptText += `📅 8주 실행 로드맵\n`;
+                gantt.forEach(task => {
+                    promptText += `- ${task.name} : ${task.start}주차 ~ ${task.end}주차\n`;
+                });
+            } else {
+                promptText += `📅 8주 실행 로드맵: (입력된 일정 없음)\n`;
+            }
+            promptText += `=====================================\n\n`;
+            promptText += `[요청사항]\n1. 이 전략의 맹점(허점)이 있다면 무엇일까?\n2. '원하는 결과'를 달성하기 위해 내가 놓친 '실행 계획'이나 '로드맵' 일정을 구체적으로 보완해 줘.\n3. 대표인 내가 당장 내일 아침 가장 먼저 지시해야 할 액션 아이템 1개를 꼽아줘.`;
+            
+            return promptText;
+        }
+
+        // 현재 캔버스에 적힌 내용 복사
+        function copyCurrentToAI() {
+            let details = {};
+            fields.forEach((id, idx) => {
+                details[labels[idx]] = document.getElementById(id).value.trim();
+            });
+            
+            const promptText = formatDataForAI(details, currentGanttTasks);
+            
+            // 임시 텍스트에리어로 복사 실행
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = promptText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            
+            showToast("AI 프롬프트가 복사되었습니다!<br>제미나이 채팅창에 붙여넣기(Ctrl+V) 하세요.");
+        }
+
+        // 저장된 특정 카드 내용 복사
+        function copyArchivedToAI(id) {
+            const history = JSON.parse(localStorage.getItem('pro_v7_0_history') || "[]");
+            const item = history.find(h => h.id === id);
+            if(item) {
+                const promptText = formatDataForAI(item.details, item.gantt);
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = promptText;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                showToast("이 전략이 클립보드에 복사되었습니다!<br>AI에게 바로 전달해 보세요.");
+            }
+        }
+
+
+        // 🌟 2. 덮어쓰기 로직 완전 삭제, 무조건 새로 저장!
+        function saveToHistory() {
+            let hasContent = false;
+            let newDetails = {};
+
+            fields.forEach((id, idx) => {
+                const val = document.getElementById(id).value.trim();
+                if(val) { newDetails[labels[idx]] = val; hasContent = true; }
+            });
+
+            if(!hasContent && currentGanttTasks.length === 0) return alert("저장할 내용을 하나라도 입력해주세요.");
+
+            let history = JSON.parse(localStorage.getItem('pro_v7_0_history') || "[]");
+
+            // 무조건 새로운 아이디로 추가 (덮어쓰기 안함)
+            history.unshift({ 
+                id: Date.now(), 
+                date: new Date().toLocaleString('ko-KR'), 
+                status: document.getElementById('strategy-status').value,
+                details: newDetails, 
+                gantt: [...currentGanttTasks] 
+            });
+
+            localStorage.setItem('pro_v7_0_history', JSON.stringify(history));
+
+            // 저장 후 화면 완벽 초기화
+            fields.forEach(id => document.getElementById(id).value = "");
+            currentGanttTasks = [];
+            document.getElementById('strategy-status').value = "초안 작성중";
+            document.getElementById('g-name').value = '';
+            
+            drawGantt();
+            renderHistory();
+            updateGanttSuggestions(); 
+            
+            showToast("저장 완료!<br>캔버스가 비워졌습니다. 새 전략을 작성하세요.");
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+
         function updateGanttSuggestions() {
             const datalist = document.getElementById('strategy-suggestions');
             datalist.innerHTML = ''; 
             const currentTitle = document.getElementById('p1_1').value.trim();
             if(currentTitle) {
                 const opt = document.createElement('option');
-                opt.value = `[현재 작성중] ${currentTitle}`;
+                opt.value = `[작성중] ${currentTitle}`;
                 datalist.appendChild(opt);
             }
-            const history = JSON.parse(localStorage.getItem('pro_v6_1_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v7_0_history') || "[]");
             history.forEach(item => {
-                const title = item.details["현황"] || "무제 전략";
-                const task = item.details["과제"] || "";
+                const title = item.details["현황(제목)"] || "무제 전략";
+                const task = item.details["핵심 과제"] || "";
                 const opt = document.createElement('option');
                 opt.value = `${title} ➔ ${task}`;
                 datalist.appendChild(opt);
@@ -217,29 +330,12 @@
         }
 
         window.onload = () => {
-            const draftStr = localStorage.getItem('pro_v6_1_draft');
-            if(draftStr) {
-                const draft = JSON.parse(draftStr);
-                currentGanttTasks = draft.gantt || [];
-                if(draft.status) document.getElementById('strategy-status').value = draft.status;
-                if(draft.fields) {
-                    fields.forEach(id => {
-                        document.getElementById(id).value = draft.fields[id] || "";
-                    });
-                }
-            }
-
-            fields.forEach(id => {
-                document.getElementById(id).addEventListener('input', () => {
-                    saveDraft();
-                    if(id === 'p1_1') updateGanttSuggestions();
-                });
-            });
-            document.getElementById('strategy-status').addEventListener('change', saveDraft);
-
             drawGantt();
             renderHistory();
             updateGanttSuggestions(); 
+            
+            // 입력할 때마다 드롭다운 갱신
+            document.getElementById('p1_1').addEventListener('input', updateGanttSuggestions);
         };
 
         function addGanttTask() {
@@ -253,21 +349,18 @@
             currentGanttTasks.push({ id: Date.now(), name, start, end });
             document.getElementById('g-name').value = '';
             document.getElementById('g-start').value = end; 
-            
             drawGantt();
-            saveDraft();
         }
 
         function removeGanttTask(id) {
             currentGanttTasks = currentGanttTasks.filter(t => t.id !== id);
             drawGantt();
-            saveDraft();
         }
 
         function drawGantt() {
             const canvas = document.getElementById('gantt-canvas');
             if(currentGanttTasks.length === 0) {
-                canvas.innerHTML = '<div class="text-slate-400 text-center text-xs mt-6">상단의 [전략 등록] 버튼을 눌러 8주 일정을 채워보세요.</div>';
+                canvas.innerHTML = '<div class="text-slate-400 text-center text-xs mt-6">상단의 [일정 등록] 버튼을 눌러 8주 일정을 채워보세요.</div>';
                 return;
             }
 
@@ -291,46 +384,11 @@
             });
         }
 
-        function saveToHistory() {
-            let hasContent = false;
-            let newDetails = {};
-
-            fields.forEach((id, idx) => {
-                const val = document.getElementById(id).value.trim();
-                if(val) { newDetails[labels[idx]] = val; hasContent = true; }
-            });
-
-            if(!hasContent && currentGanttTasks.length === 0) return alert("저장할 내용을 하나라도 입력해주세요.");
-
-            let history = JSON.parse(localStorage.getItem('pro_v6_1_history') || "[]");
-
-            history.unshift({ 
-                id: Date.now(), 
-                date: new Date().toLocaleString('ko-KR'), 
-                status: document.getElementById('strategy-status').value,
-                details: newDetails, 
-                gantt: [...currentGanttTasks] 
-            });
-
-            localStorage.setItem('pro_v6_1_history', JSON.stringify(history));
-
-            fields.forEach(id => document.getElementById(id).value = "");
-            currentGanttTasks = [];
-            document.getElementById('strategy-status').value = "초안 작성중";
-
-            drawGantt();
-            renderHistory();
-            updateGanttSuggestions(); 
-            saveDraft(); 
-            
-            showToast("전략이 성공적으로 저장되고 새 캔버스가 열렸습니다!");
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
 
         function renderHistory() {
             const container = document.getElementById('history-container');
             const summaryBoard = document.getElementById('auto-summary-board');
-            const history = JSON.parse(localStorage.getItem('pro_v6_1_history') || "[]");
+            const history = JSON.parse(localStorage.getItem('pro_v7_0_history') || "[]");
             
             document.getElementById('history-count').innerText = `${history.length}건`;
 
@@ -344,9 +402,9 @@
             let containerHtml = "";
 
             history.forEach((item, index) => {
-                const title = item.details["현황"] || `새로운 도약 전략 #${history.length - index}`;
-                const coreTask = item.details["과제"] || "-";
-                const outcome = item.details["결과"] ? `➔ 🎯 ${item.details["결과"]}` : '';
+                const title = item.details["현황(제목)"] || `새로운 전략 #${history.length - index}`;
+                const coreTask = item.details["핵심 과제"] || "-";
+                const outcome = item.details["원하는 결과"] ? `➔ 🎯 ${item.details["원하는 결과"]}` : '';
                 const taskCount = item.gantt ? item.gantt.length : 0;
                 
                 let statusColor = "bg-gray-100 text-gray-600";
@@ -357,34 +415,39 @@
                     <div class="auto-summary-item flex flex-col justify-center">
                         <div class="flex items-center mb-1">
                             <span class="${statusColor} text-[10px] font-bold px-2 py-0.5 rounded mr-2 whitespace-nowrap">${item.status}</span>
-                            <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold"><i class="fas fa-tasks mr-1"></i>태스크 ${taskCount}개</span>
+                            <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-bold"><i class="fas fa-tasks mr-1"></i>태스크 ${taskCount}개</span>
                         </div>
                         <div class="truncate text-slate-700 font-medium text-[0.8rem]">
-                            <b class="text-blue-700">[${title}]</b> ➔ ${coreTask} ${outcome}
+                            <b class="text-indigo-700">[${title}]</b> ➔ ${coreTask} ${outcome}
                         </div>
                     </div>
                 `;
 
-                // 🌟 버그 수정: 아카이브 카드에서 글자가 잘리지 않도록 truncate 클래스를 제거하고 whitespace-pre-wrap 추가
-                const previewLabels = ['과제', '목표', '결과', '결정']; 
+                // 표시할 항목: 과제, 목표, 결과, 결정
+                const previewLabels = ['핵심 과제', '해결 목표', '원하는 결과', '최적안 결정']; 
                 const detailsHtml = previewLabels.map(key => {
                     if(item.details[key]) {
-                        const colorClass = key === '결과' ? 'text-purple-600' : 'text-blue-600';
-                        const bgClass = key === '결과' ? 'bg-purple-50 border-purple-100' : 'bg-gray-50 border-gray-100';
+                        const colorClass = key === '원하는 결과' ? 'text-purple-600' : 'text-blue-600';
+                        const bgClass = key === '원하는 결과' ? 'bg-purple-50 border-purple-100' : 'bg-gray-50 border-gray-100';
                         return `<div class="${bgClass} p-2 rounded border"><div class="text-[10px] font-bold ${colorClass} mb-1">${key}</div><div class="text-xs text-gray-700 whitespace-pre-wrap">${item.details[key]}</div></div>`;
                     } return '';
                 }).join('');
 
                 containerHtml += `
                     <div id="card-${item.id}" class="history-card bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-                        <div class="flex justify-between items-center mb-3">
-                            <div class="flex items-center">
-                                <span class="${statusColor} text-[10px] font-bold px-2 py-1 rounded mr-3">${item.status}</span>
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex flex-col">
+                                <div class="flex items-center mb-1">
+                                    <span class="${statusColor} text-[10px] font-bold px-2 py-1 rounded mr-2">${item.status}</span>
+                                    <span class="text-xs text-gray-400">${item.date}</span>
+                                </div>
                                 <h3 class="text-md font-extrabold text-gray-900">${title}</h3>
                             </div>
                             <div class="flex gap-2 no-print card-buttons">
-                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded font-bold transition"><i class="fas fa-eye mr-1"></i>캔버스로 불러오기</button>
-                                <button onclick="exportSingleCard(${item.id})" class="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1.5 rounded font-bold transition">PDF 다운</button>
+                                <button onclick="copyArchivedToAI(${item.id})" class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded font-bold transition flex items-center">
+                                    <i class="fas fa-robot mr-1"></i> AI전달 복사
+                                </button>
+                                <button onclick="loadStrategy(${item.id})" class="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1.5 rounded font-bold transition">불러오기(참고용)</button>
                                 <button onclick="deleteStrategy(${item.id})" class="text-xs text-red-400 hover:text-red-600 p-1.5"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
@@ -397,44 +460,44 @@
             container.innerHTML = containerHtml;
         }
 
+        // 불러오기 (수정용이 아님, 그냥 화면에 띄워주는 용도)
         function loadStrategy(id) {
-            const history = JSON.parse(localStorage.getItem('pro_v6_1_history') || "[]");
-            const item = history.find(h => h.id === id);
-            if(item) {
-                fields.forEach((fieldId, idx) => { document.getElementById(fieldId).value = item.details[labels[idx]] || ""; });
-                document.getElementById('strategy-status').value = item.status || "초안 작성중";
-                currentGanttTasks = item.gantt ? [...item.gantt] : [];
-                
-                drawGantt();
-                updateGanttSuggestions();
-                saveDraft(); 
-                
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                showToast("전략을 불러왔습니다! 내용을 변경 후 저장하면 새로운 카드로 등록됩니다.");
+            if(confirm("현재 캔버스의 내용을 지우고 과거 전략을 불러오시겠습니까?")) {
+                const history = JSON.parse(localStorage.getItem('pro_v7_0_history') || "[]");
+                const item = history.find(h => h.id === id);
+                if(item) {
+                    fields.forEach((fieldId, idx) => { document.getElementById(fieldId).value = item.details[labels[idx]] || ""; });
+                    document.getElementById('strategy-status').value = item.status || "초안 작성중";
+                    currentGanttTasks = item.gantt ? [...item.gantt] : [];
+                    
+                    drawGantt();
+                    updateGanttSuggestions();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showToast("기존 전략을 불러왔습니다.<br>이 내용을 수정 후 저장하면 '새로운 전략'으로 1개 더 추가됩니다.");
+                }
             }
         }
 
         function deleteStrategy(id) {
             if(confirm("이 전략을 영구 삭제하시겠습니까?")) {
-                let history = JSON.parse(localStorage.getItem('pro_v6_1_history') || "[]");
+                let history = JSON.parse(localStorage.getItem('pro_v7_0_history') || "[]");
                 history = history.filter(h => h.id !== id);
-                localStorage.setItem('pro_v6_1_history', JSON.stringify(history));
+                localStorage.setItem('pro_v7_0_history', JSON.stringify(history));
                 renderHistory();
                 updateGanttSuggestions();
             }
         }
 
-        // 🌟 버그 수정 1: Textarea의 내용이 잘리지 않도록 임시로 길이를 늘려주는 함수
+        // 🌟 3. PDF 포맷팅 교정 로직
         function expandTextareas() {
             const textareas = document.querySelectorAll('textarea');
             textareas.forEach(ta => {
-                ta.dataset.origHeight = ta.style.height || ''; // 원래 길이 저장
-                ta.style.height = 'auto'; // 리셋
-                ta.style.height = (ta.scrollHeight + 5) + 'px'; // 숨겨진 글자만큼 길이를 좍 늘림
+                ta.dataset.origHeight = ta.style.height || ''; 
+                ta.style.height = 'auto'; 
+                ta.style.height = (ta.scrollHeight + 10) + 'px'; // 텍스트 짤림 방지
             });
         }
 
-        // 늘렸던 길이를 원상복구 하는 함수
         function restoreTextareas() {
             const textareas = document.querySelectorAll('textarea');
             textareas.forEach(ta => {
@@ -442,65 +505,29 @@
             });
         }
 
-        // 🌟 버그 수정 2: 개별 카드 출력 시 하얀 화면 나오는 문제 해결 (복제 캡처 방식)
-        function exportSingleCard(id) {
-            const originalElement = document.getElementById(`card-${id}`);
-            // 원본을 건드리지 않고 똑같이 생긴 복제본을 만듦
-            const clonedElement = originalElement.cloneNode(true);
-            
-            // 복제본에서 버튼 삭제
-            const buttons = clonedElement.querySelector('.card-buttons');
-            if(buttons) buttons.remove();
-
-            // 복제본을 화면 최상단(눈에 안보이게 뒤로)에 임시로 붙임
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.top = '0';
-            tempContainer.style.left = '0';
-            tempContainer.style.width = '1400px'; 
-            tempContainer.style.padding = '30px';
-            tempContainer.style.backgroundColor = '#f1f5f9';
-            tempContainer.style.zIndex = '-9999';
-            
-            tempContainer.appendChild(clonedElement);
-            document.body.appendChild(tempContainer);
-
-            const opt = { 
-                margin: 10, 
-                filename: `Strategy_Card_${id}.pdf`, 
-                image: { type: 'jpeg', quality: 1 }, 
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
-            };
-            
-            // 임시로 붙인 복제본을 사진 찍고 바로 삭제
-            html2pdf().set(opt).from(tempContainer).save().then(() => {
-                document.body.removeChild(tempContainer);
-            });
-        }
-
-        // 🌟 버그 수정 3: 대시보드 전체(아카이브 포함) 저장 및 글자 잘림 방지
         function exportFullPDF() {
-            expandTextareas(); // 글자 잘림 방지 발동!
+            // PDF가 아닌 AI 추출을 권장하는 알림
+            alert("💡 PDF 저장을 시작합니다.\n\n(참고: 제미나이와 회의할 목적이라면, 상단의 [AI에게 전달하기] 버튼을 눌러 텍스트로 복사하는 것이 훨씬 강력하고 빠릅니다!)");
+            
+            expandTextareas(); 
             
             const noPrints = document.querySelectorAll('.no-print');
             noPrints.forEach(el => el.style.display = 'none');
             
             const origScroll = window.scrollY;
-            window.scrollTo(0, 0); // 맨 위로 올려서 하얀 화면 버그 방지
+            window.scrollTo(0, 0); 
 
-            // 타겟을 print-master-area 로 넓혀서 저장된 아카이브까지 다 나오게 함
             const element = document.getElementById('print-master-area');
             const opt = { 
                 margin: [10, 5, 10, 5], 
-                filename: `REBOOT_Full_Dashboard.pdf`, 
+                filename: `REBOOT_Strategy_Report.pdf`, 
                 image: { type: 'jpeg', quality: 1 }, 
                 html2canvas: { scale: 1.5, useCORS: true, scrollY: 0 }, 
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
             };
             
             html2pdf().set(opt).from(element).save().then(() => {
-                restoreTextareas(); // 글자 상자 크기 원상 복구
+                restoreTextareas(); 
                 noPrints.forEach(el => el.style.display = '');
                 window.scrollTo(0, origScroll);
             });
